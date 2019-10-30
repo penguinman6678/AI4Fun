@@ -1,4 +1,7 @@
 # For Tic-Tae-Toe
+### What is about Tic-Tae-Toe
+### Why this game is selected for demonstration here-- especially w.r.t. A.I.
+
 ## Game.py --  the main module to run a game
 #### Update
 |Date | Summary|
