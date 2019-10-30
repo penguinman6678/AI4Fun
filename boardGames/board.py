@@ -37,9 +37,9 @@ class Board():
     def __str__(self):
         strings = ""
         index_row = 0
-        print("   " + " ".join(map(str, range(self.col))))
+        print("BOARD\t   " + " ".join(map(str, range(self.col))))
         for each_row in range(self.row):
-            strings += self.row_index[index_row] + ": " + " ".join(map(str, self.board[each_row, :]))
+            strings += "BOARD\t" + self.row_index[index_row] + ": " + " ".join(map(str, self.board[each_row, :]))
             index_row += 1
             strings += "\n"
         return strings.encode('utf-8').decode('utf-8')

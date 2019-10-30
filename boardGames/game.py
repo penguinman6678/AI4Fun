@@ -2,6 +2,7 @@ from board import Board
 from player import Player
 import numpy as np
 import utils as UT
+import json
 
 class Game():
     GAME_STATUS = ["Playing", "End", "Draw"]
@@ -64,15 +65,20 @@ class Game():
                 UT.print_as_log(self.board.sequences_of_movements)
                 game_log['winner'] = self.turn.get_marker()
                 game_log['sequence'] = self.board.sequences_of_movements
-                return self.turn
+                break
+
             elif self.is_draw():
                 print("FinalResult: Draw")
                 #UT.print_as_log("Draw.... so, exiting the game")
                 print(self.board)
                 game_log['winner'] = "D"
                 game_log['sequence'] = self.board.sequences_of_movements
-                return None
+                break
+
             self.set_to_next_player()
+
+        json_str = game_log #json.dumps(game_log)
+        return json_str
 
     def a_move_for_agent(self):
         r, c  = self.a_move_for_agent_helper()
@@ -98,4 +104,6 @@ if __name__ == "__main__":
     first_turn_id = 0
     game = Game(players, first_turn_id, board)
     #game.init_game(players,first_turn_id, board)
-    game.play_game()
+    json_str = game.play_game()
+    UT.write_json_to_file(json_str)
+
