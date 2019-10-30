@@ -8,6 +8,10 @@
 3. How to extend this idea to other games like [Go](https://deepmind.com/research/case-studies/alphago-the-story-so-far)
 
 ## Game.py --  the main module to run a game
+```sh
+$>python3 game.py
+```
+   - this will save output (a json object) to "./game_output.log" 
 #### Update
 |Date | Summary|
 | ------ | ------ |
