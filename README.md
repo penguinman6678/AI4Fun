@@ -6,7 +6,12 @@ to put things together for instructions/summaries/examples
 #### systems
 1. OS: Mac
 2. Programming: Python 3.6+
+   - how to install virtualenv
+```sh
+$>python3 -m pip install virtualenv
+```
    - install python using virtualenv
+      - to create a local version of python env, you can create an virtual env for a python
 ```sh
 $>virtualenv -p python3 my_venv_test
 $> source my_venv_test/bin/activate
