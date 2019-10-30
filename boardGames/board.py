@@ -32,6 +32,7 @@ class Board():
         self.available_position = {}
         self.init_available_positions()
         self.components = {}
+        self.sequences_of_movements = []
 
     def __str__(self):
         strings = ""
@@ -57,7 +58,7 @@ class Board():
         self.update_available_positions(r_index, c_index)
         index_in_board = self.coordinate_to_indices(r_index, c_index)
         player.add_movement(index_in_board)
-
+        self.sequences_of_movements.append({'turn': player.get_marker(), 'position':index_in_board, 'xy':(r_index,c_index)})
 
     def get_available_positions(self):
         all_available = {}
@@ -76,10 +77,12 @@ class Board():
         cell_index = 0
         win_status = False
 
-        UT.print_as_log("Board status")
+
+        ## to store movements made by the current player so far
         stack_for_current_player = player.get_movements()[:] # return a sequence of cell indices (which are converted from (r, c))
         stack_for_current_player.sort(reverse=False)
-        print(stack_for_current_player)
+        UT.print_as_log("Movement so far: " + str(stack_for_current_player))
+        UT.print_as_log("Board status")
 
         if len(stack_for_current_player) < self.number_of_connected_tobe_win:
             # print "Total number of stones for this player is less than the required,  " \

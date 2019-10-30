@@ -22,7 +22,7 @@ class Game():
 
     def check_end_status(self, a_player):
         if self.board.is_win(a_player):
-            UT.print_as_log("FinalResult\tWinning by %s" % (a_player))
+
             return True
         return False
 
@@ -47,7 +47,7 @@ class Game():
 
     def play_game(self):
         turn_id = 0
-
+        game_log = {'winner':"", 'sequence':{}}
         while self.check_end_status(self.turn) != True:
             print(self.board)
             if self.turn.get_player_type() == Player.PTYPE_HUMAN:
@@ -58,12 +58,19 @@ class Game():
             self.board.set_a_move(r_v, c_v, self.turn)
             UT.print_as_log(self.board.get_available_positions())
             if self.check_end_status(self.turn):
+                print("FinalResult: %s" % (self.turn.get_marker()))
                 print(self.board)
-                UT.print_as_log("Winning and so ending this game")
+                #UT.print_as_log("Winning and so ending this game")
+                UT.print_as_log(self.board.sequences_of_movements)
+                game_log['winner'] = self.turn.get_marker()
+                game_log['sequence'] = self.board.sequences_of_movements
                 return self.turn
             elif self.is_draw():
+                print("FinalResult: Draw")
+                #UT.print_as_log("Draw.... so, exiting the game")
                 print(self.board)
-                UT.print_as_log("Draw.... so, exiting the game")
+                game_log['winner'] = "D"
+                game_log['sequence'] = self.board.sequences_of_movements
                 return None
             self.set_to_next_player()
 
