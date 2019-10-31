@@ -11,3 +11,9 @@ def write_json_to_file(json_st, filename=None):
     with open(outputname, 'w') as fd:
         json.dump(json_st, fd )
 
+def read_a_game(filename):
+    move_sequences_json = None
+    with open(filename, 'r') as fd:
+        move_sequences_json = json.load(fd)
+    return move_sequences_json
+

@@ -1,8 +1,11 @@
+
 from board import Board
 from player import Player
+from draw_board import Draw
+
 import numpy as np
 import utils as UT
-import json
+import sys
 
 class Game():
     GAME_STATUS = ["Playing", "End", "Draw"]
@@ -49,14 +52,21 @@ class Game():
     def play_game(self):
         turn_id = 0
         game_log = {'winner':"", 'sequence':{}}
+        canvas_for_drawing = Draw()
+        is_draw = False
+
         while self.check_end_status(self.turn) != True:
             print(self.board)
+
             if self.turn.get_player_type() == Player.PTYPE_HUMAN:
                 r_v, c_v = self.validate_input()
             else:
                 r_v, c_v = self.a_move_for_agent()
 
             self.board.set_a_move(r_v, c_v, self.turn)
+
+            canvas_for_drawing.move_and_draw(r_v, c_v, self.turn.get_marker())
+
             UT.print_as_log(self.board.get_available_positions())
             if self.check_end_status(self.turn):
                 print("FinalResult: %s" % (self.turn.get_marker()))
@@ -65,17 +75,26 @@ class Game():
                 UT.print_as_log(self.board.sequences_of_movements)
                 game_log['winner'] = self.turn.get_marker()
                 game_log['sequence'] = self.board.sequences_of_movements
+
                 break
 
             elif self.is_draw():
+                is_draw = True
                 print("FinalResult: Draw")
                 #UT.print_as_log("Draw.... so, exiting the game")
                 print(self.board)
                 game_log['winner'] = "D"
                 game_log['sequence'] = self.board.sequences_of_movements
                 break
-
-            self.set_to_next_player()
+            else:
+                self.set_to_next_player()
+                
+        ## for writing a message to the canvas
+        result_message = "Game result -- Winner is %s" % (game_log.get("winner"))
+        if is_draw:
+            result_message = "Game result :  Draw"
+        canvas_for_drawing.write_text(result_message)
+        canvas_for_drawing.exit_on_click()
 
         json_str = game_log #json.dumps(game_log)
         return json_str
@@ -94,16 +113,52 @@ class Game():
             return True
         return False
 
+    @staticmethod
+    def load_a_game(afile):
+        move_sequences = UT.read_a_game(afile)
+        if move_sequences:
+            Game.parse_history(move_sequences)
+    @staticmethod
+    def parse_history(adict):
+
+
+        winner = adict.get("winner", None)
+        if winner == None:
+            print("Something is wrong")
+            sys.exit(1)
+        move_sequences = adict.get("sequence", None)
+
+        board_obj_from_history = Board(3, 3, 3)
+        # below obj is for drawing the board on a canvas.
+        # if you don't like, you can make it comment
+        draw_board_obj = Draw()
+        for each_move in move_sequences:
+            player_marker = each_move.get("turn")
+            r_index, c_index = each_move.get("xy")
+            p = Player("test", player_marker, 1)
+            board_obj_from_history.set_a_move(r_index, c_index, p)
+            draw_board_obj.move_and_draw(r_index, c_index, player_marker)
+            print(board_obj_from_history)
+        draw_board_obj.write_text(("Winner is:  %s" %(player_marker)))
+        draw_board_obj.exit_on_click()
+
 if __name__ == "__main__":
-    board_size = 3
-    num_connected = 3
-    board = Board(board_size, board_size, num_connected)
-    p1 = Player("white", "O", Player.PTYPE_AGENT)
-    p2 = Player("black", "X", Player.PTYPE_AGENT)
-    players = [p1, p2]
-    first_turn_id = 0
-    game = Game(players, first_turn_id, board)
-    #game.init_game(players,first_turn_id, board)
-    json_str = game.play_game()
-    UT.write_json_to_file(json_str)
+    Play_or_Load = 1
+    if Play_or_Load == 1:
+        board_size = 3
+        num_connected = 3
+        board = Board(board_size, board_size, num_connected)
+        # a player has Player.PTYPE_HUMAN for a human player
+        p1 = Player("white", "O", Player.PTYPE_AGENT)
+        p2 = Player("black", "X", Player.PTYPE_AGENT)
+        players = [p1, p2]
+        first_turn_id = 0
+        game = Game(players, first_turn_id, board)
+        #game.init_game(players,first_turn_id, board)
+        json_str = game.play_game()
+        UT.write_json_to_file(json_str)
+
+    elif Play_or_Load == 2:
+        # this means loading from a file
+        Game.load_a_game("./game_output.log")
 
