@@ -18,5 +18,6 @@ $>python3 game.py
 |Oct 31 2019 | game.py is based on two agent playing which will dump outputs of history of movements as well as drawing steps/movements in a canvas using Turtle  |
 |Oct 29 2019 | game.py is based on two agent playing which will dump outputs of history of movements  |
 #### Things to do
-1. need to add a functionality to allow a user to select an option for 1) user vs computer; 2) computer (agent) vs computer (agent)
-2. update the function from board.py to tell if a component is connected for a winning -- much smarter way 
+1. Need to add a functionality to allow a user to select an option for 1) user vs computer; 2) computer (agent) vs computer (agent)
+2. Update the function from board.py to tell if a component is connected for a winning -- much smarter way
+3. Add an evaluation function to find an optimal movement given a state of the board
