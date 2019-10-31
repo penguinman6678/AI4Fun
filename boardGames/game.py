@@ -88,7 +88,7 @@ class Game():
                 break
             else:
                 self.set_to_next_player()
-                
+
         ## for writing a message to the canvas
         result_message = "Game result -- Winner is %s" % (game_log.get("winner"))
         if is_draw:

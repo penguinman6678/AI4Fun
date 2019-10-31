@@ -3,7 +3,7 @@
 You can test this py script by
 $>python3 draw_board.py
 which will execute the commands defined in main
-The below codes are modified from https://repl.it/@kiman100/Tic-Tac-Toe-with-turtle
+The below codes are significantly modified from https://repl.it/@kiman100/Tic-Tac-Toe-with-turtle
 '''
 import random
 import turtle
