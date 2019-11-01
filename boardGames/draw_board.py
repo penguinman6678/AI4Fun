@@ -102,10 +102,13 @@ class Draw():
         #turtle.title(astr)
     def exit_on_click(self):
         turtle.exitonclick()
+        ## the below statement is important when another refreshed canvas is required without restarting the program
         turtle.TurtleScreen._RUNNING = True
     def reset_canvas(self):
         turtle.reset()
         turtle.TurtleScreen._RUNNING = True
+
+
 if __name__=="__main__":
 
     board_size = 400

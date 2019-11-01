@@ -23,3 +23,9 @@ def read_a_game(filename):
         move_sequences_json = json.load(fd)
     return move_sequences_json
 
+def read_games(filename):
+    list_of_dicts = []
+    with open(filename, 'r') as fd:
+        for each_line in fd:
+            list_of_dicts.append(json.loads(each_line))
+    return list_of_dicts

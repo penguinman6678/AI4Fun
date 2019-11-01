@@ -165,7 +165,7 @@ def run_n_simulations(n):
         first_turn_id = np.random.choice([0, 1])
         board = Board(board_size, board_size, num_connected)
         each_game = Game(players, first_turn_id, board)
-        each_game.show_progress_on_canvas(True)
+        each_game.show_progress_on_canvas(False)
         json_str  = each_game.play_game()
         UT.write_json_to_file(json_str)
         p1.reset()
