@@ -132,7 +132,6 @@ class Game():
     @staticmethod
     def parse_history(adict):
 
-
         winner = adict.get("winner", None)
         if winner == None:
             print("Something is wrong")
@@ -152,6 +151,7 @@ class Game():
             print(board_obj_from_history)
         draw_board_obj.write_text(("Winner is:  %s" %(player_marker)))
         draw_board_obj.exit_on_click()
+
 ## since this is the simulation based, we will use agent vs agent
 def run_n_simulations(n):
     board_size = 3
@@ -170,6 +170,7 @@ def run_n_simulations(n):
         UT.write_json_to_file(json_str)
         p1.reset()
         p2.reset()
+
 
 
 if __name__ == "__main__":
@@ -194,6 +195,9 @@ if __name__ == "__main__":
 
     elif Play_or_Load == 2:
         # this means loading from a file
-        Game.load_a_game("./game_output.log")
+        #Game.load_a_game("./game_output.log")
+
+        for each_item in UT.read_games("./game_output.log"):
+            Game.parse_history(each_item)
 
 '''
