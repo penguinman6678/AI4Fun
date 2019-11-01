@@ -7,6 +7,8 @@ import numpy as np
 import utils as UT
 import sys
 
+import turtle
+
 class Game():
     GAME_STATUS = ["Playing", "End", "Draw"]
 
@@ -56,6 +58,7 @@ class Game():
         game_log = {'winner':"", 'sequence':{}}
 
         if self.flag_for_drawing_canvas:
+            #turtle.setup(500, 500)
             canvas_for_drawing = Draw()
         is_draw_gametie = False
 
@@ -102,6 +105,8 @@ class Game():
             canvas_for_drawing.write_text(result_message)
             canvas_for_drawing.exit_on_click()
 
+            #canvas_for_drawing.reset_canvas()
+            #turtle.TurtleScreen._RUNNING = True
         json_str = game_log #json.dumps(game_log)
         return json_str
 
@@ -147,7 +152,29 @@ class Game():
             print(board_obj_from_history)
         draw_board_obj.write_text(("Winner is:  %s" %(player_marker)))
         draw_board_obj.exit_on_click()
+## since this is the simulation based, we will use agent vs agent
+def run_n_simulations(n):
+    board_size = 3
+    num_connected = 3
+    p1 = Player("white", "O", Player.PTYPE_AGENT)
+    p2 = Player("black", "X", Player.PTYPE_AGENT)
+    players = [p1, p2]
 
+    for i in range(n):
+
+        first_turn_id = np.random.choice([0, 1])
+        board = Board(board_size, board_size, num_connected)
+        each_game = Game(players, first_turn_id, board)
+        each_game.show_progress_on_canvas(True)
+        json_str  = each_game.play_game()
+        UT.write_json_to_file(json_str)
+        p1.reset()
+        p2.reset()
+
+
+if __name__ == "__main__":
+    run_n_simulations(2)
+'''
 if __name__ == "__main__":
     Play_or_Load = 1
     if Play_or_Load == 1:
@@ -169,3 +196,4 @@ if __name__ == "__main__":
         # this means loading from a file
         Game.load_a_game("./game_output.log")
 
+'''

@@ -25,3 +25,6 @@ class Player():
         return self.marker
     def get_player_type(self):
         return self.ptype
+    def reset(self):
+        self.__init__(self.name, self.marker, self.ptype)
+

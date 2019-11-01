@@ -8,7 +8,7 @@ The below codes are significantly modified from https://repl.it/@kiman100/Tic-Ta
 import random
 import turtle
 import math
-
+from turtle import Screen
 
 class Draw():
     def __init__(self, board_size=400):
@@ -16,6 +16,7 @@ class Draw():
         self.board_size = board_size
         self.board_size /= 2
         self.turtle_obj = turtle.Turtle()
+
         self.draw_board()
 
     def draw_board(self):
@@ -101,6 +102,10 @@ class Draw():
         #turtle.title(astr)
     def exit_on_click(self):
         turtle.exitonclick()
+        turtle.TurtleScreen._RUNNING = True
+    def reset_canvas(self):
+        turtle.reset()
+        turtle.TurtleScreen._RUNNING = True
 if __name__=="__main__":
 
     board_size = 400
@@ -109,5 +114,6 @@ if __name__=="__main__":
     dboard.drawO()
     dboard.move_cursor_to_cell(0, 2)
     dboard.drawX()
-    turtle.exitonclick()       # this to exit cleanly
+    dboard.turtle_obj.clear()
+    #.exitonclick()       # this to exit cleanly
     #turtle.mainloop()
