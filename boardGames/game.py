@@ -18,7 +18,9 @@ class Game():
         self.turn_id = turn_id
         self.status = Game.GAME_STATUS[0]
         self.turn = self.players[self.turn_id]
-
+        self.flag_for_drawing_canvas = False
+    def show_progress_on_canvas(self, a_boolean_flag):
+        self.flag_for_drawing_canvas = a_boolean_flag
     def set_to_next_player(self):
         next_turn = ( self.turn_id + 1) % len(self.players)
         self.turn_id = next_turn
@@ -52,8 +54,10 @@ class Game():
     def play_game(self):
         turn_id = 0
         game_log = {'winner':"", 'sequence':{}}
-        canvas_for_drawing = Draw()
-        is_draw = False
+
+        if self.flag_for_drawing_canvas:
+            canvas_for_drawing = Draw()
+        is_draw_gametie = False
 
         while self.check_end_status(self.turn) != True:
             print(self.board)
@@ -64,10 +68,11 @@ class Game():
                 r_v, c_v = self.a_move_for_agent()
 
             self.board.set_a_move(r_v, c_v, self.turn)
-
-            canvas_for_drawing.move_and_draw(r_v, c_v, self.turn.get_marker())
-
             UT.print_as_log(self.board.get_available_positions())
+            ## Drawing on canvas
+            if self.flag_for_drawing_canvas:
+                canvas_for_drawing.move_and_draw(r_v, c_v, self.turn.get_marker())
+
             if self.check_end_status(self.turn):
                 print("FinalResult: %s" % (self.turn.get_marker()))
                 print(self.board)
@@ -79,7 +84,7 @@ class Game():
                 break
 
             elif self.is_draw():
-                is_draw = True
+                is_draw_gametie = True
                 print("FinalResult: Draw")
                 #UT.print_as_log("Draw.... so, exiting the game")
                 print(self.board)
@@ -90,11 +95,12 @@ class Game():
                 self.set_to_next_player()
 
         ## for writing a message to the canvas
-        result_message = "Game result -- Winner is %s" % (game_log.get("winner"))
-        if is_draw:
-            result_message = "Game result :  Draw"
-        canvas_for_drawing.write_text(result_message)
-        canvas_for_drawing.exit_on_click()
+        if self.flag_for_drawing_canvas:
+            result_message = "Game result -- Winner is %s" % (game_log.get("winner"))
+            if is_draw_gametie:
+                result_message = "Game result :  Draw"
+            canvas_for_drawing.write_text(result_message)
+            canvas_for_drawing.exit_on_click()
 
         json_str = game_log #json.dumps(game_log)
         return json_str
@@ -102,7 +108,7 @@ class Game():
     def a_move_for_agent(self):
         r, c  = self.a_move_for_agent_helper()
         return r,c
-
+    ## this is the function for an agent to come up with a smarter decision
     def a_move_for_agent_helper(self):
         all_available_positions_dict = self.board.get_available_positions()
         random_move_index = np.random.randint(0, len(all_available_positions_dict),1)[0]
@@ -154,7 +160,8 @@ if __name__ == "__main__":
         players = [p1, p2]
         first_turn_id = 0
         game = Game(players, first_turn_id, board)
-        #game.init_game(players,first_turn_id, board)
+        # before playing a game, you can enable or disable to draw on canvas by
+        game.show_progress_on_canvas(True)
         json_str = game.play_game()
         UT.write_json_to_file(json_str)
 
