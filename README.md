@@ -48,5 +48,5 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 ## First programming excercise
 #### Boardgame
-##### Tic-Tac-Toe (3 by 3 board)
+##### Tic-Tac-Toe (3 by 3 size of a board)
 1. [Tic-Tac-Toe](boardGames/README.md)
