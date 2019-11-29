@@ -64,7 +64,7 @@ class Game():
             r, c = self.get_input()
             if available_pos.get((r, c), 0) == 1:
                 break
-            Game.print_as_log("Try again. Your input")
+            print("Try again. Your input")
         return r, c
 
 
