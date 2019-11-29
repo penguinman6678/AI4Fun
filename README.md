@@ -1,6 +1,6 @@
 
 # AI4Fun
-to put things together for instructions/summaries/examples
+to put things together for instructions/summaries/examples to share my experiences
 
 ## Prerequisites
 #### systems
