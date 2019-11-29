@@ -7,7 +7,10 @@ import numpy as np
 import utils as UT
 import sys
 
+
 import turtle
+
+from policies import Policy, MCTSPolicy
 
 class Game():
     GAME_STATUS = ["Playing", "End", "Draw"]
@@ -21,6 +24,10 @@ class Game():
         self.status = Game.GAME_STATUS[0]
         self.turn = self.players[self.turn_id]
         self.flag_for_drawing_canvas = False
+
+        self.mctsObj_O = MCTSPolicy(self.players[1], self.players[0])
+
+
     def show_progress_on_canvas(self, a_boolean_flag):
         self.flag_for_drawing_canvas = a_boolean_flag
     def set_to_next_player(self):
@@ -28,9 +35,17 @@ class Game():
         self.turn_id = next_turn
         self.turn = self.players[self.turn_id]
 
+    def is_end(self):
+        if self.is_draw():
+            return True
+
+        for each_player in self.players:
+            if self.check_end_status(each_player):
+                return True
+        return False
+
     def check_end_status(self, a_player):
         if self.board.is_win(a_player):
-
             return True
         return False
 
@@ -56,6 +71,7 @@ class Game():
     def play_game(self):
         turn_id = 0
         game_log = {'winner':"", 'sequence':{}}
+        canvas_for_drawing = None
 
         if self.flag_for_drawing_canvas:
             #turtle.setup(500, 500)
@@ -68,7 +84,7 @@ class Game():
             if self.turn.get_player_type() == Player.PTYPE_HUMAN:
                 r_v, c_v = self.validate_input()
             else:
-                r_v, c_v = self.a_move_for_agent()
+                r_v, c_v = self.mctsObj_O.move(self.board)
 
             self.board.set_a_move(r_v, c_v, self.turn)
             UT.print_as_log(self.board.get_available_positions())
@@ -158,6 +174,7 @@ def run_n_simulations(n):
     num_connected = 3
     p1 = Player("white", "O", Player.PTYPE_AGENT)
     p2 = Player("black", "X", Player.PTYPE_AGENT)
+
     players = [p1, p2]
 
     for i in range(n):
@@ -171,10 +188,23 @@ def run_n_simulations(n):
         p1.reset()
         p2.reset()
 
+def human_vs_MCTS():
+    board_size = 3
+    num_connected = 3
+    p1 = Player("black", "X", Player.PTYPE_HUMAN)
+    p2 = Player("white", "O", Player.PTYPE_AGENT)
+
+    players = [p1, p2]
+    board = Board(board_size, board_size, num_connected)
+    each_game = Game(players, 0, board)
+    each_game.show_progress_on_canvas(True)
+    json_str  = each_game.play_game()
+    UT.write_json_to_file(json_str)
 
 
 if __name__ == "__main__":
-    run_n_simulations(2)
+    #run_n_simulations(2)
+    human_vs_MCTS()
 '''
 if __name__ == "__main__":
     Play_or_Load = 1

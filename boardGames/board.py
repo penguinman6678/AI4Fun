@@ -4,6 +4,7 @@ import sys, os ,re
 import numpy as np
 from player import Player
 import utils as UT
+import copy
 
 
 """
@@ -32,7 +33,9 @@ class Board():
         self.available_position = {}
         self.init_available_positions()
         self.components = {}
+        self.current_player_marker = None
         self.sequences_of_movements = []
+        self.sequences_of_movements_per_player = {}
 
     def __str__(self):
         strings = ""
@@ -43,6 +46,12 @@ class Board():
             index_row += 1
             strings += "\n"
         return strings.encode('utf-8').decode('utf-8')
+
+    def __key(self):
+        return self.__str__()
+
+    def __eq__(x, y):
+        return x.__key() == y.__key()
 
     def init_available_positions(self):
         for r in range(self.row):
@@ -57,8 +66,15 @@ class Board():
         self.board[r_index][c_index] = player.get_marker()
         self.update_available_positions(r_index, c_index)
         index_in_board = self.coordinate_to_indices(r_index, c_index)
-        player.add_movement(index_in_board)
+        #player.add_movement(index_in_board)
         self.sequences_of_movements.append({'turn': player.get_marker(), 'position':index_in_board, 'xy':(r_index,c_index)})
+        self.current_player_marker = player.get_marker()
+        an_info_for_this_move_dict = {'position': index_in_board, 'xy': (r_index, c_index)}
+
+        if player.get_marker() not in self.sequences_of_movements_per_player:
+            self.sequences_of_movements_per_player[player.get_marker()] = [an_info_for_this_move_dict]
+        else:
+            self.sequences_of_movements_per_player[player.get_marker()].append(an_info_for_this_move_dict)
 
     def get_available_positions(self):
         all_available = {}
@@ -67,9 +83,36 @@ class Board():
                 all_available[p] = 1
         return all_available
 
+    def get_uniq_player_marks(self):
+        return list(self.sequences_of_movements_per_player.keys())
+
+    def get_positions_for_player(self, player):
+        positions_made_so_far =[]
+        player_marker = player
+        if isinstance(player, Player):
+            player_marker = player.get_marker()
+        for r in range(self.row):
+            for c in range(self.col):
+                if self.board[r][c] == player_marker:
+                    positions_made_so_far.append(self.coordinate_to_indices(r,c))
+        return positions_made_so_far
+    #Todo
+    def winner(self):
+        for each_player_mark in self.get_uniq_player_marks():
+            if self.is_win(each_player_mark):
+                return each_player_mark
+
+        if len(self.get_available_positions()) < 1:
+            return "Tie"
+        return None
 
     def is_win(self, player):
-        which_turn = player.get_marker()
+
+        which_turn = player
+
+        if isinstance(player, Player):
+            which_turn = player.get_marker()
+
         UT.print_as_log("Checking for the winning state for player: " + which_turn)
 
         connected_number = 1
@@ -79,7 +122,7 @@ class Board():
 
 
         ## to store movements made by the current player so far
-        stack_for_current_player = player.get_movements()[:] # return a sequence of cell indices (which are converted from (r, c))
+        stack_for_current_player = self.get_positions_for_player(player) #player.get_movements()[:] # return a sequence of cell indices (which are converted from (r, c))
         stack_for_current_player.sort(reverse=False)
         UT.print_as_log("Movement so far: " + str(stack_for_current_player))
         UT.print_as_log("Board status")
@@ -213,6 +256,22 @@ class Board():
         r = int((an_index-1) / self.col)
         c = int((an_index-1) % self.col)
         return r, c
+
+    def legal_moves(self):
+        return list(self.get_available_positions().keys())
+
+    def transition_function(self, r, c, player):
+        assert (r, c) in self.legal_moves()
+
+        # First, make a copy of the current state
+        new_state = copy.deepcopy(self)
+
+        # Then, apply the action to produce the new state
+        new_state.set_a_move(r, c, player)
+
+        return new_state
+    # Todo
+    ## Change function winner to generalize
 
 ## to test class Board...
 if __name__ == "__main__":
