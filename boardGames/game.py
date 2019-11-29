@@ -6,11 +6,9 @@ from draw_board import Draw
 import numpy as np
 import utils as UT
 import sys
-
-
 import turtle
-
 from policies import Policy, MCTSPolicy
+import uuid
 
 class Game():
     GAME_STATUS = ["Playing", "End", "Draw"]
@@ -25,8 +23,13 @@ class Game():
         self.turn = self.players[self.turn_id]
         self.flag_for_drawing_canvas = False
 
+        ## MCTSPolicy(a, b) -- a is player, b is for an opponent
         self.mctsObj_O = MCTSPolicy(self.players[1], self.players[0])
+        self.mctsObj_X = MCTSPolicy(self.players[0], self.players[1])
 
+        self.mctsObjs = [self.mctsObj_X, self.mctsObj_O]
+
+        self.game_id = uuid.uuid1()
 
     def show_progress_on_canvas(self, a_boolean_flag):
         self.flag_for_drawing_canvas = a_boolean_flag
@@ -70,7 +73,7 @@ class Game():
 
     def play_game(self):
         turn_id = 0
-        game_log = {'winner':"", 'sequence':{}}
+        game_log = {'game_uuid': self.get_game_id(), 'winner':"", 'sequence':{}}
         canvas_for_drawing = None
 
         if self.flag_for_drawing_canvas:
@@ -83,8 +86,12 @@ class Game():
 
             if self.turn.get_player_type() == Player.PTYPE_HUMAN:
                 r_v, c_v = self.validate_input()
-            else:
-                r_v, c_v = self.mctsObj_O.move(self.board)
+            else:  # when Player is an agent
+                if self.turn.get_marker() == "O":
+                    r_v, c_v = self.mctsObj_O.move(self.board)
+                elif self.turn.get_marker() == "X":
+                    r_v, c_v = self.mctsObj_X.move(self.board)
+
 
             self.board.set_a_move(r_v, c_v, self.turn)
             UT.print_as_log(self.board.get_available_positions())
@@ -165,24 +172,25 @@ class Game():
             board_obj_from_history.set_a_move(r_index, c_index, p)
             draw_board_obj.move_and_draw(r_index, c_index, player_marker)
             print(board_obj_from_history)
-        draw_board_obj.write_text(("Winner is:  %s" %(player_marker)))
+        draw_board_obj.write_text(("Winner is:  %s" %(winner)))
         draw_board_obj.exit_on_click()
-
+    def get_game_id(self):
+        return str(self.game_id)
 ## since this is the simulation based, we will use agent vs agent
 def run_n_simulations(n):
     board_size = 3
     num_connected = 3
-    p1 = Player("white", "O", Player.PTYPE_AGENT)
-    p2 = Player("black", "X", Player.PTYPE_AGENT)
+    p1 = Player("white", "X", Player.PTYPE_AGENT)
+    p2 = Player("black", "O", Player.PTYPE_AGENT)
 
     players = [p1, p2]
 
     for i in range(n):
 
-        first_turn_id = np.random.choice([0, 1])
+        first_turn_id = 0  # np.random.choice([0, 1])
         board = Board(board_size, board_size, num_connected)
         each_game = Game(players, first_turn_id, board)
-        each_game.show_progress_on_canvas(True)
+        each_game.show_progress_on_canvas(False)
         json_str  = each_game.play_game()
         UT.write_json_to_file(json_str)
         p1.reset()
@@ -201,33 +209,29 @@ def human_vs_MCTS():
     json_str  = each_game.play_game()
     UT.write_json_to_file(json_str)
 
+def MCTS_vs_MCTS():
+    board_size = 3
+    num_connected = 3
+    p1 = Player("black", "X", Player.PTYPE_AGENT)
+    p2 = Player("white", "O", Player.PTYPE_AGENT)
+
+    players = [p1, p2]
+    board = Board(board_size, board_size, num_connected)
+    each_game = Game(players, 0, board)
+    each_game.show_progress_on_canvas(True)
+    json_str  = each_game.play_game()
+    UT.write_json_to_file(json_str)
+
+DO_PLAY = 1
+LOAD_PLAY = 2
 
 if __name__ == "__main__":
-    #run_n_simulations(2)
-    human_vs_MCTS()
-'''
-if __name__ == "__main__":
-    Play_or_Load = 1
-    if Play_or_Load == 1:
-        board_size = 3
-        num_connected = 3
-        board = Board(board_size, board_size, num_connected)
-        # a player has Player.PTYPE_HUMAN for a human player
-        p1 = Player("white", "O", Player.PTYPE_AGENT)
-        p2 = Player("black", "X", Player.PTYPE_AGENT)
-        players = [p1, p2]
-        first_turn_id = 0
-        game = Game(players, first_turn_id, board)
-        # before playing a game, you can enable or disable to draw on canvas by
-        game.show_progress_on_canvas(True)
-        json_str = game.play_game()
-        UT.write_json_to_file(json_str)
 
-    elif Play_or_Load == 2:
-        # this means loading from a file
-        #Game.load_a_game("./game_output.log")
-
+    GAME_MODE = DO_PLAY
+    if GAME_MODE == DO_PLAY:
+         run_n_simulations(100)
+        # human_vs_MCTS()
+        # MCTS_vs_MCTS()
+    elif GAME_MODE == LOAD_PLAY:
         for each_item in UT.read_games("./game_output.log"):
             Game.parse_history(each_item)
-
-'''

@@ -56,7 +56,7 @@ class Draw():
             self.turtle_obj.sety(-self.board_size/2.7)
 
     def drawX(self):
-        self.turtle_obj.speed(2)
+        self.turtle_obj.speed(5)
         self.turtle_obj.back(self.board_size/7)
         self.turtle_obj.left(90)
         self.turtle_obj.forward(self.board_size/7)
@@ -74,7 +74,7 @@ class Draw():
 
     def drawO(self):
         self.turtle_obj.pu()
-        self.turtle_obj.speed(3)
+        self.turtle_obj.speed(5)
         self.turtle_obj.left(90)
         self.turtle_obj.forward(self.board_size/7)
         self.turtle_obj.right(90)
