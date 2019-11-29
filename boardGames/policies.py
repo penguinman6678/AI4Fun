@@ -365,12 +365,15 @@ class MCTSPolicy(Policy):
 
         exploitation_value = w / (n + epsilon)
         exploration_value = c * np.sqrt(np.log(t) / (n + epsilon))
+
+
+        value = exploitation_value + 1.0 * exploration_value
+        #SAM IS HERE
+        print(" \ **** ")
         print('exploration_value: {}'.format(exploration_value))
-
-        value = exploitation_value + 0.0 * exploration_value
-
+        print(self.digraph.nodes()[state]['attr_dict']['state'])
         print('UCT value {:.3f} for state:\n{}'.format(value, state))
-
+        print(" ****** / ")
         self.digraph._node[state]['uct'] = value
 
         return value
