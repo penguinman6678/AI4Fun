@@ -192,7 +192,7 @@ def run_n_simulations(n):
         each_game = Game(players, first_turn_id, board)
         each_game.show_progress_on_canvas(False)
         json_str  = each_game.play_game()
-        UT.write_json_to_file(json_str)
+        #UT.write_json_to_file(json_str)
         p1.reset()
         p2.reset()
 
@@ -229,7 +229,7 @@ if __name__ == "__main__":
 
     GAME_MODE = DO_PLAY
     if GAME_MODE == DO_PLAY:
-         run_n_simulations(100)
+         run_n_simulations(1)
         # human_vs_MCTS()
         # MCTS_vs_MCTS()
     elif GAME_MODE == LOAD_PLAY:

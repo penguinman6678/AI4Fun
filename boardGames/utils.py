@@ -3,7 +3,8 @@ import json
 import os.path
 
 def print_as_log(astr):
-    print("LOG_MESSAGE\t%s" % (str(astr)))
+    #print("LOG_MESSAGE\t%s" % (str(astr)))
+    pass
 
 def write_json_to_file(json_st, filename=None):
     outputname = "./game_output.log"
