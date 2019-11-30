@@ -323,6 +323,7 @@ class MCTSPolicy(Policy):
         current_state = self.digraph._node[node]['attr_dict']['state']
         players = [self.player, self.oppoent]
         ind_current_player = 1
+        # Until reaching to the end of the game, we need to take turns
         while not current_state.winner():
             move = random_policy.move(current_state)
             current_state = current_state.transition_function(*move, players[ind_current_player % 2])
