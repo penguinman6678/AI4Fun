@@ -7,7 +7,7 @@ import numpy as np
 import utils as UT
 import sys
 import turtle
-from policies import Policy, MCTSPolicy
+from policies import RandomPolicy, MCTSPolicy
 import uuid
 
 class Game():
@@ -23,6 +23,8 @@ class Game():
         self.turn = self.players[self.turn_id]
         self.flag_for_drawing_canvas = False
 
+        # in case a move needs to be made through Random
+        self.random_policy = RandomPolicy()
         ## MCTSPolicy(a, b) -- a is player, b is for an opponent
         self.mctsObj_O = MCTSPolicy(self.players[1], self.players[0])
         self.mctsObj_X = MCTSPolicy(self.players[0], self.players[1])
@@ -30,6 +32,7 @@ class Game():
         self.mctsObjs = [self.mctsObj_X, self.mctsObj_O]
 
         self.game_id = uuid.uuid1()
+
 
     def show_progress_on_canvas(self, a_boolean_flag):
         self.flag_for_drawing_canvas = a_boolean_flag
@@ -90,7 +93,11 @@ class Game():
                 if self.turn.get_marker() == "O":
                     r_v, c_v = self.mctsObj_O.move(self.board)
                 elif self.turn.get_marker() == "X":
-                    r_v, c_v = self.mctsObj_X.move(self.board)
+                    if self.turn.get_policy_mode() == "Random":
+                        self.random_policy = RandomPolicy()
+                        r_v, c_v = self.random_policy.move(self.board)
+                    else:
+                        r_v, c_v = self.mctsObj_X.move(self.board)
 
 
             self.board.set_a_move(r_v, c_v, self.turn)
@@ -180,7 +187,7 @@ class Game():
 def run_n_simulations(n):
     board_size = 3
     num_connected = 3
-    p1 = Player("white", "X", Player.PTYPE_AGENT)
+    p1 = Player("white", "X", Player.PTYPE_AGENT, "Random")
     p2 = Player("black", "O", Player.PTYPE_AGENT)
 
     players = [p1, p2]
@@ -212,7 +219,7 @@ def human_vs_MCTS():
 def MCTS_vs_MCTS():
     board_size = 3
     num_connected = 3
-    p1 = Player("black", "X", Player.PTYPE_AGENT)
+    p1 = Player("black", "X", Player.PTYPE_AGENT, "Random")
     p2 = Player("white", "O", Player.PTYPE_AGENT)
 
     players = [p1, p2]
