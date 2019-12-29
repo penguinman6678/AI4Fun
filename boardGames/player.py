@@ -3,6 +3,7 @@
 class Player():
     PTYPE_HUMAN = 1
     PTYPE_AGENT = 0
+
     def __init__(self, str_name, str_marker, ptype=0, policy_type="MCTS"):
         self.name = str_name
         self.marker = str_marker ## in { "x" or "o"}
@@ -14,10 +15,6 @@ class Player():
             self.ptype = Player.PTYPE_AGENT
         else:
             self.policy_type = "Human"
-
-
-
-        #self.movements = []
 
 
     def __str__(self):

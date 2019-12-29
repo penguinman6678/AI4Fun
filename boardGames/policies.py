@@ -132,7 +132,7 @@ class MCTSPolicy(Policy):
             for node in self.digraph.nodes():
                 if self.digraph._node[node]['attr_dict']['state'] == starting_state:
                     starting_node = node
-        computational_budget = 10
+        computational_budget = 100
         for i in range(computational_budget):
             self.num_simulations += 1
             if self.DEBUG_POLICY:
