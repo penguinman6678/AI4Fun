@@ -76,7 +76,9 @@ class Game():
 
     def play_game(self):
         turn_id = 0
-        game_log = {'game_uuid': self.get_game_id(), 'winner':"", 'sequence':{}}
+        game_log = {'game_uuid': self.get_game_id(), 'play_modes': {'X': self.players[0].get_policy_mode(),
+                                                                    'O': self.players[1].get_policy_mode()},
+                    'winner':"", 'sequence':{}}
         canvas_for_drawing = None
 
         if self.flag_for_drawing_canvas:
@@ -96,6 +98,7 @@ class Game():
                     if self.turn.get_policy_mode() == "Random":
                         self.random_policy = RandomPolicy()
                         r_v, c_v = self.random_policy.move(self.board)
+                        #print("AM I HERE FOR RANDOM")
                     else:
                         r_v, c_v = self.mctsObj_X.move(self.board)
 
@@ -187,19 +190,16 @@ class Game():
 def run_n_simulations(n):
     board_size = 3
     num_connected = 3
-    p1 = Player("white", "X", Player.PTYPE_AGENT, "Random")
-    p2 = Player("black", "O", Player.PTYPE_AGENT)
-
-    players = [p1, p2]
-
     for i in range(n):
-
+        p1 = Player("white", "X", Player.PTYPE_AGENT)
+        p2 = Player("black", "O", Player.PTYPE_AGENT)
+        players = [p1, p2]
         first_turn_id = 0  # np.random.choice([0, 1])
         board = Board(board_size, board_size, num_connected)
         each_game = Game(players, first_turn_id, board)
         each_game.show_progress_on_canvas(False)
         json_str  = each_game.play_game()
-        #UT.write_json_to_file(json_str)
+        UT.write_json_to_file(json_str)
         p1.reset()
         p2.reset()
 
@@ -219,7 +219,7 @@ def human_vs_MCTS():
 def MCTS_vs_MCTS():
     board_size = 3
     num_connected = 3
-    p1 = Player("black", "X", Player.PTYPE_AGENT, "Random")
+    p1 = Player("black", "X", Player.PTYPE_AGENT)
     p2 = Player("white", "O", Player.PTYPE_AGENT)
 
     players = [p1, p2]
@@ -236,9 +236,9 @@ if __name__ == "__main__":
 
     GAME_MODE = DO_PLAY
     if GAME_MODE == DO_PLAY:
-         run_n_simulations(1)
+        run_n_simulations(50000)
         # human_vs_MCTS()
-        # MCTS_vs_MCTS()
+        #MCTS_vs_MCTS()
     elif GAME_MODE == LOAD_PLAY:
         for each_item in UT.read_games("./game_output.log"):
             Game.parse_history(each_item)

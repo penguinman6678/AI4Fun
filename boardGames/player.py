@@ -8,9 +8,13 @@ class Player():
         self.marker = str_marker ## in { "x" or "o"}
         self.ptype = Player.PTYPE_HUMAN  # to indicate if a player is human vs. agent
 
+        self.policy_type = policy_type
+
         if ptype != Player.PTYPE_HUMAN:
             self.ptype = Player.PTYPE_AGENT
-        self.policy_type = policy_type
+        else:
+            self.policy_type = "Human"
+
 
 
         #self.movements = []
