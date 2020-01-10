@@ -60,6 +60,14 @@ class Board():
     def update_available_positions(self, r, c):
         self.available_position[(r,c)] = 0
 
+    def convert_sequence_moves_to_vector(self):
+        individual_sequence = [0] * 9
+        for item in self.sequences_of_movements:
+            turn_for_this_move = item.get("turn")
+            move_made_for_this_move = item.get("position")
+            individual_sequence[move_made_for_this_move - 1] = 1 if turn_for_this_move == "X" else 2
+        return np.array([individual_sequence])
+
 
     def set_a_move(self, r_index, c_index, player):
 

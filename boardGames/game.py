@@ -7,8 +7,13 @@ import numpy as np
 import utils as UT
 import sys
 import turtle
-from policies import RandomPolicy, MCTSPolicy
+from policies import RandomPolicy, MCTSPolicy, ModelPolicy
 import uuid
+
+
+from keras.models import load_model
+from keras.models import model_from_json
+import json
 
 class Game():
     GAME_STATUS = ["Playing", "End", "Draw"]
@@ -26,10 +31,17 @@ class Game():
         # in case a move needs to be made through Random
         self.random_policy = RandomPolicy()
         ## MCTSPolicy(a, b) -- a is player, b is for an opponent
-        self.mctsObj_O = MCTSPolicy(self.players[1], self.players[0])
+
         self.mctsObj_X = MCTSPolicy(self.players[0], self.players[1])
+        self.mctsObj_O = MCTSPolicy(self.players[1], self.players[0])
 
         self.mctsObjs = [self.mctsObj_X, self.mctsObj_O]
+
+        model_dir = "/Users/chihoon/works/mlBooks/introML/simple_template/AI4Fun/boardGames/analysis-tools/models_ex/"
+        model_w_file = "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924weights.h5"
+        model_json_file = "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924in_json.json"
+
+        self.model_based_policy = ModelPolicy(model_dir, model_w_file, model_json_file)
 
         self.game_id = uuid.uuid1()
 
@@ -73,6 +85,15 @@ class Game():
             print("Try again. Your input")
         return r, c
 
+    # def convert_sequence_moves_to_vector(self):
+    #     individual_sequence = [0] * 9
+    #     for item in self.board.sequences_of_movements:
+    #         turn_for_this_move = item.get("turn")
+    #         move_made_for_this_move = item.get("position")
+    #         individual_sequence[move_made_for_this_move - 1] = 1 if turn_for_this_move == "X" else 2
+    #
+    #     return np.array([individual_sequence])
+
 
     def play_game(self):
         turn_id = 0
@@ -86,21 +107,50 @@ class Game():
             canvas_for_drawing = Draw()
         is_draw_gametie = False
 
+        from model_loader import ModelBasedAgent
+        model_dir = "/Users/chihoon/works/mlBooks/introML/simple_template/AI4Fun/boardGames/analysis-tools/models_ex/"
+        model_w_file = model_dir + "current_best.h5" #"model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924weights.h5"
+        model_json_file = model_dir + "current_best.json" #model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924in_json.json"
+        model_agent_obj = ModelBasedAgent(model_w_file, model_json_file)
+        mlModel = model_agent_obj.get_model()
+
         while self.check_end_status(self.turn) != True:
             print(self.board)
-
+            test_instance = self.board.convert_sequence_moves_to_vector()
+            print(test_instance)
             if self.turn.get_player_type() == Player.PTYPE_HUMAN:
+                # TODO -- this part is just to make a simplified interface of modelbased movement
+                # later, this will be the part of Policy as a ModelPolicy class
+                # for now, we assume player O would be model.. as X is always starting first
+
+                #test_instance = np.array([an_instance])
+
+                prediction_move = mlModel.predict_proba(test_instance)[0]
+                pp = model_agent_obj.predict_proba(test_instance)[0]
+                UT.print_three_arrays(test_instance[0], pp, prediction_move)
+                move_by_prediction = np.argmax(pp) + 1
+                r_e, c_e = self.board.indices_to_coordinate(move_by_prediction)
+
                 r_v, c_v = self.validate_input()
+                print("R:%d C:%d \t i_e:%d R_e:%d C_e:%d" % (r_v, c_v, move_by_prediction, r_e, c_e))
             else:  # when Player is an agent
-                if self.turn.get_marker() == "O":
-                    r_v, c_v = self.mctsObj_O.move(self.board)
-                elif self.turn.get_marker() == "X":
-                    if self.turn.get_policy_mode() == "Random":
-                        self.random_policy = RandomPolicy()
-                        r_v, c_v = self.random_policy.move(self.board)
-                        #print("AM I HERE FOR RANDOM")
-                    else:
-                        r_v, c_v = self.mctsObj_X.move(self.board)
+                if self.turn.get_policy_mode() == "MODEL":
+                    r_v, c_v = self.model_based_policy.move(self.board)
+                elif self.turn.get_policy_mode() == "MCTS":
+                    if self.turn.get_marker() == "O":
+                        r_v, c_v = self.mctsObj_O.move(self.board)
+                        # TODO -- this part is just to make a simplified interface of modelbased movement
+                        # This could be a place for ModelBased action
+                    elif self.turn.get_marker() == "X":
+                        if self.turn.get_policy_mode() == "Random":
+                            self.random_policy = RandomPolicy()
+                            r_v, c_v = self.random_policy.move(self.board)
+                            # print("AM I HERE FOR RANDOM")
+                        else:
+                            r_v, c_v = self.mctsObj_X.move(self.board)
+                elif self.turn.get_policy_mode() == "Random":
+                    self.random_policy = RandomPolicy()
+                    r_v, c_v = self.random_policy.move(self.board)
 
 
             self.board.set_a_move(r_v, c_v, self.turn)
@@ -112,6 +162,7 @@ class Game():
             if self.check_end_status(self.turn):
                 print("FinalResult: %s" % (self.turn.get_marker()))
                 print(self.board)
+                print(self.board.convert_sequence_moves_to_vector())
                 #UT.print_as_log("Winning and so ending this game")
                 UT.print_as_log(self.board.sequences_of_movements)
                 game_log['winner'] = self.turn.get_marker()
@@ -124,6 +175,7 @@ class Game():
                 print("FinalResult: Draw")
                 #UT.print_as_log("Draw.... so, exiting the game")
                 print(self.board)
+                print(self.board.convert_sequence_moves_to_vector())
                 game_log['winner'] = "D"
                 game_log['sequence'] = self.board.sequences_of_movements
                 break
@@ -186,6 +238,8 @@ class Game():
         draw_board_obj.exit_on_click()
     def get_game_id(self):
         return str(self.game_id)
+
+
 ## since this is the simulation based, we will use agent vs agent
 def run_n_simulations(n):
     board_size = 3
@@ -216,6 +270,22 @@ def human_vs_MCTS():
     json_str  = each_game.play_game()
     UT.write_json_to_file(json_str)
 
+def MCTS_vs_MODEL():
+
+    board_size = 3
+    num_connected = 3
+    p1 = Player("black", "X", Player.PTYPE_AGENT, "MCTS")
+    #p2 = Player("white", "O", Player.PTYPE_HUMAN)
+    p2 = Player("white", "O", Player.PTYPE_AGENT, "MODEL")
+
+    players = [p1, p2]
+    board = Board(board_size, board_size, num_connected)
+    each_game = Game(players, 0, board)
+    each_game.show_progress_on_canvas(True)
+    json_str  = each_game.play_game()
+    UT.write_json_to_file(json_str)
+
+
 def MCTS_vs_MCTS():
     board_size = 3
     num_connected = 3
@@ -229,6 +299,8 @@ def MCTS_vs_MCTS():
     json_str  = each_game.play_game()
     UT.write_json_to_file(json_str)
 
+def humans_vs_model_agent():
+    pass
 DO_PLAY = 1
 LOAD_PLAY = 2
 
@@ -236,8 +308,9 @@ if __name__ == "__main__":
 
     GAME_MODE = DO_PLAY
     if GAME_MODE == DO_PLAY:
-        run_n_simulations(50000)
-        # human_vs_MCTS()
+        #run_n_simulations(100000)
+        #human_vs_MCTS()
+        MCTS_vs_MODEL()
         #MCTS_vs_MCTS()
     elif GAME_MODE == LOAD_PLAY:
         for each_item in UT.read_games("./game_output.log"):
