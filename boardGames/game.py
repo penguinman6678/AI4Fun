@@ -9,6 +9,7 @@ import sys
 import turtle
 from policies import RandomPolicy, MCTSPolicy, ModelPolicy
 import uuid
+import time
 
 
 from keras.models import load_model
@@ -215,14 +216,14 @@ class Game():
         if move_sequences:
             Game.parse_history(move_sequences)
     @staticmethod
-    def parse_history(adict):
+    def parse_history(adict, message_str=None):
 
         winner = adict.get("winner", None)
         if winner == None:
             print("Something is wrong")
             sys.exit(1)
         move_sequences = adict.get("sequence", None)
-
+        turtle.hideturtle()
         board_obj_from_history = Board(3, 3, 3)
         # below obj is for drawing the board on a canvas.
         # if you don't like, you can make it comment
@@ -234,8 +235,15 @@ class Game():
             board_obj_from_history.set_a_move(r_index, c_index, p)
             draw_board_obj.move_and_draw(r_index, c_index, player_marker)
             print(board_obj_from_history)
-        draw_board_obj.write_text(("Winner is:  %s" %(winner)))
-        draw_board_obj.exit_on_click()
+
+        draw_board_obj.write_text(("Winner is:  %s -- sampled %s" %(winner, str(message_str))))
+        time.sleep(3)
+        draw_board_obj.turtle_obj.getpen().clear()
+        draw_board_obj.turtle_obj.getscreen().clearscreen()
+
+        # draw_board_obj.exit_on_click()
+        # or
+
     def get_game_id(self):
         return str(self.game_id)
 
@@ -270,21 +278,23 @@ def human_vs_MCTS():
     json_str  = each_game.play_game()
     UT.write_json_to_file(json_str)
 
-def MCTS_vs_MODEL():
+def MCTS_vs_MODEL(n):
 
     board_size = 3
     num_connected = 3
-    p1 = Player("black", "X", Player.PTYPE_AGENT, "MCTS")
-    #p2 = Player("white", "O", Player.PTYPE_HUMAN)
-    p2 = Player("white", "O", Player.PTYPE_AGENT, "MODEL")
 
-    players = [p1, p2]
-    board = Board(board_size, board_size, num_connected)
-    each_game = Game(players, 0, board)
-    each_game.show_progress_on_canvas(True)
-    json_str  = each_game.play_game()
-    UT.write_json_to_file(json_str)
-
+    for i in range(n):
+        p1 = Player("black", "X", Player.PTYPE_AGENT, "MCTS")
+        #p2 = Player("white", "O", Player.PTYPE_HUMAN)
+        p2 = Player("white", "O", Player.PTYPE_AGENT, "MODEL")
+        players = [p1, p2]
+        board = Board(board_size, board_size, num_connected)
+        each_game = Game(players, 0, board)
+        each_game.show_progress_on_canvas(False)
+        json_str  = each_game.play_game()
+        UT.write_json_to_file(json_str)
+        p1.reset()
+        p2.reset()
 
 def MCTS_vs_MCTS():
     board_size = 3
@@ -306,12 +316,18 @@ LOAD_PLAY = 2
 
 if __name__ == "__main__":
 
-    GAME_MODE = DO_PLAY
+    #GAME_MODE = DO_PLAY
+    GAME_MODE = LOAD_PLAY
     if GAME_MODE == DO_PLAY:
         #run_n_simulations(100000)
         #human_vs_MCTS()
-        MCTS_vs_MODEL()
+        MCTS_vs_MODEL(200)
         #MCTS_vs_MCTS()
     elif GAME_MODE == LOAD_PLAY:
-        for each_item in UT.read_games("./game_output.log"):
-            Game.parse_history(each_item)
+        all_games = UT.read_games("./game_output.log")
+        sampled_games = np.random.choice(all_games, 3)
+        c = 0
+        print(len(sampled_games))
+        for index, each_item in enumerate(sampled_games):
+            Game.parse_history(each_item, index)
+            print(c)

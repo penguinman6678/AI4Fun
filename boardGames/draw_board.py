@@ -105,7 +105,8 @@ class Draw():
         ## the below statement is important when another refreshed canvas is required without restarting the program
         turtle.TurtleScreen._RUNNING = True
     def reset_canvas(self):
-        turtle.reset()
+        turtle.getpen().clear()
+        turtle.clear()
         turtle.TurtleScreen._RUNNING = True
 
 
