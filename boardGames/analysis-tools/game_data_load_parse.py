@@ -42,12 +42,25 @@ def parse_history(adict):
 def analyze_game(file_name):
     games = UT.read_games(file_name)
     winning_count = {}
+    average_num_moves_per_game = {}
+    first_move_stats = {}
     for i  in range(len(games)):
         each_game = games[i]
         a_player = each_game.get("winner")
+        num_moves = len(each_game.get("sequence"))
+        if a_player in average_num_moves_per_game:
+            average_num_moves_per_game[a_player].append(num_moves)
+        else:
+            average_num_moves_per_game[a_player] =[num_moves]
         winning_count[a_player] = winning_count.get(a_player, 0) + 1
+        if a_player != "Draw":
+            first_move_info = each_game.get("sequence")[0]
+            first_move = tuple(first_move_info.get("xy"))
+            first_move_stats[first_move] = first_move_stats.get(first_move, 0) + 1
+
     move_tree = build_session_second_degree(games)
-    return winning_count, move_tree
+    first_move_stats_sorted = sorted(first_move_stats.items(), key=lambda kv: kv[1], reverse=True)
+    return winning_count, move_tree, average_num_moves_per_game, first_move_stats_sorted
 
 def build_session_second_degree(games):
 
@@ -414,10 +427,51 @@ def print_training_samples(alist, file_out_name=None):
         ",".join(map(str, each_sample[1])) + "\t"+
         ",".join(map(str, each_sample[2]))
         )
+def pretty_print_wining_stats(a_dict, target_marker="O"):
+    total_games = sum(list(a_dict.values()))
+    winning_times = float(a_dict.get(target_marker))
+    opponent_winning_times = total_games - (a_dict.get("D", 0) + winning_times)
+    try:
+        print("Target: %s winning rate:%f from total games %d" % (target_marker, winning_times/total_games,
+                                                                  total_games))
+        if opponent_winning_times > 0:
+            print("Winning rate over opponent: %f" % (winning_times / opponent_winning_times))
+        else:
+            print("Winning rate over opponent: 100%")
+        print("Winning rate of opponent: %f"   % (opponent_winning_times/total_games))
+        print(a_dict)
+    except:
+        print("Error in computing winning rate for target %s" %(target_marker))
+        print(a_dict)
+
 if __name__ == "__main__":
     file_name = sys.argv[1]
-    #parse_data_example(file_name)
-    list_of_dict_for_games, training_samples, focused_samples = parse_jsons_example(file_name)
-    print_training_samples(training_samples, "./samples_all_training.txt")
-    print_training_samples(focused_samples[0], "./samples_to_enhance_winning.txt")
-    print_training_samples(focused_samples[1], "./samples_to_prevent_losing.txt")
+    training_data_generation_flag = False
+    if len(sys.argv) > 2 :
+        training_data_generation_flag = True
+        pre_fix = sys.argv[2]
+
+        tmp_input = input("Type a new pre_fix if you want to change: ")
+        if not (tmp_input.lower() == "no" or tmp_input == "n" or len(tmp_input) < 1):
+            pre_fix = tmp_input
+        print("Prefix for outputs to be saved is: %s"% (pre_fix))
+    if training_data_generation_flag:
+
+        if len(sys.argv) < 3:
+            print("Do you want to generate Training data? If so, type a prefix ")
+            sys.exit(1)
+        list_of_dict_for_games, training_samples, focused_samples = parse_jsons_example(file_name)
+        output_dir = "./training_data_sets/"
+        print_training_samples(training_samples, output_dir  + pre_fix + "_samples_all_training.txt")
+        print_training_samples(focused_samples[0], output_dir + pre_fix + "_samples_to_enhance_winning.txt")
+        print_training_samples(focused_samples[1], output_dir + pre_fix + "_samples_to_prevent_losing.txt")
+    else:
+        winning_stats_dict, move_tree, averaged_moves, first_move_stats = analyze_game(file_name)
+        pretty_print_wining_stats(winning_stats_dict)
+        for each_player in averaged_moves.keys():
+            average_move = averaged_moves[each_player]
+            averaged_move_value = sum(average_move)/len(average_move)
+            print("Player: %s averaged moves to win:%f" %(each_player, averaged_move_value))
+        print("Stats on the first moves from winning game history")
+        print(first_move_stats)
+
