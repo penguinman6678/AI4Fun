@@ -3,6 +3,9 @@
 - column 2 -- y in board display format
 - column 3 -- y in a training label format as predicting a next movement
 
+### mp4 file
+- Based on a game log between two players, the mp4 file is to show the heat-map for a first move that lead to winning for a second player
+
 #### Commands to run
 - game_output_1k_sample.log
    - is the file from the simulations -- e.g. MCTS vs MCTS
