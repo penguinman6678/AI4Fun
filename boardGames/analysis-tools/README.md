@@ -7,6 +7,17 @@
 - game_output_1k_sample.log
    - is the file from the simulations -- e.g. MCTS vs MCTS
    - is 1k sampled from game_output.log from directory boardGames
+   - To produce a summary of the log
+```
+$>python3 game_data_load_parse.py game_output_1k_sample.log
+```
+  -  To produce a training data set from a log file
+```
+$>python3 game_data_load_parse.py game_output_1k_sample.log output_tag_for_training
+```
+
+- Deprecated below
 ```
 $>python3 game_data_load_parse_v1.py game_output_1k_sample.log
 ```
+
