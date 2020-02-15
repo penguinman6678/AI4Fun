@@ -3,15 +3,22 @@ import json
 import os.path
 import numpy as np
 
+log_output_dir = "./log_outs"
 def print_as_log(astr):
     #print("LOG_MESSAGE\t%s" % (str(astr)))
     pass
 
-def write_json_to_file(json_st, filename=None):
-    outputname = "./game_output.log"
+def write_json_to_file(json_st, filename_prefix=None, filename_postfix = None):
 
-    if filename != None:
-        outputname = filename
+    #import time
+    #time_stamp_str = time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
+
+    #import inspect
+    #arg_names = inspect.getargspec(write_json_to_file).args
+    outputname = "game_output"
+    if filename_prefix != None:
+        outputname = filename_prefix + "_" + outputname
+    outputname = log_output_dir + "/{0}_{1}.log".format(outputname, filename_postfix)
     output_rule_to_append_or_create = 'w'
     if os.path.isfile(outputname):
         output_rule_to_append_or_create = 'a'

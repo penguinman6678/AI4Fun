@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
+
 import sys, os ,re
 import numpy as np
-from player import Player
+#from player import Player
 import utils as UT
 import copy
 
@@ -97,8 +98,11 @@ class Board():
     def get_positions_for_player(self, player):
         positions_made_so_far =[]
         player_marker = player
-        if isinstance(player, Player):
+        #if isinstance(player, Player):
+        try:
             player_marker = player.get_marker()
+        except:
+            pass
         for r in range(self.row):
             for c in range(self.col):
                 if self.board[r][c] == player_marker:
@@ -118,8 +122,11 @@ class Board():
 
         which_turn = player
 
-        if isinstance(player, Player):
+        #if isinstance(player, Player):
+        try:
             which_turn = player.get_marker()
+        except:
+            pass
 
         UT.print_as_log("Checking for the winning state for player: " + which_turn)
 

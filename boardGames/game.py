@@ -7,14 +7,20 @@ import numpy as np
 import utils as UT
 import sys
 import turtle
-from policies import RandomPolicy, MCTSPolicy, ModelPolicy
+from policies import RandomPolicy, MCTSPolicy , ModelPolicy
 import uuid
 import time
 
+import model_config
 
+import traceback
 from keras.models import load_model
 from keras.models import model_from_json
 import json
+
+import argparse
+
+log_output_dir = "./log_outs/"
 
 class Game():
     GAME_STATUS = ["Playing", "End", "Draw"]
@@ -37,13 +43,72 @@ class Game():
         self.mctsObj_O = MCTSPolicy(self.players[1], self.players[0])
 
         self.mctsObjs = [self.mctsObj_X, self.mctsObj_O]
-
-        model_dir = "/Users/chihoon/works/mlBooks/introML/simple_template/AI4Fun/boardGames/analysis-tools/models_ex/"
+        """
+        model_dir = "./analysis-tools/models_ex/"
         model_w_file = "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924weights.h5"
         model_json_file = "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924in_json.json"
+        """
+        self.model_based_policy = None # ModelPolicy(model_dir, model_w_file, model_json_file)
+        for each_player in self.players:
+            print(each_player.get_policy_mode())
+            if each_player.get_policy_mode() == "MODEL":
+                model_dir = "./analysis-tools/models_ex/"
+                #model_w_file = "model_2020-01-09-17-23-04_BEST_SO_FAR_WITH_Early_Stop-0.730-upto2-0.925weights.h5"
+                #model_json_file ="model_2020-01-09-17-23-04_BEST_SO_FAR_WITH_Early_Stop-0.730-upto2-0.925in_json.json"
 
-        self.model_based_policy = ModelPolicy(model_dir, model_w_file, model_json_file)
+                # Second best
+                #model_w_file =  "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924weights.h5"
+                #model_json_file = "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924in_json.json"
+                # very good  Best
+                #model_w_file = "model_2020-01-11-11-16-48_win_sample_focus_0.875_weights.h5"
+                #model_json_file = "model_2020-01-11-11-16-48_win_sample_focus_0.875_in_json.json"
+                # third good
+                #model_json_file = "model_2020-01-11-20-11-26_win_sample_focus_0.91_in_json.json"
+                #model_w_file = "model_2020-01-11-20-11-26_win_sample_focus_0.91_weights.h5"
 
+                ## LOOKS best so far.. waiting to be done
+                model_json_file = "model_2020-01-11-20-39-46_winAndLoss_sample_focus_0.71_in_json.json"
+                model_w_file = "model_2020-01-11-20-39-46_winAndLoss_sample_focus_0.71_weights.h5"
+
+                # Done
+                model_json_file = "model_2020-01-11-21-07-12_winAndLoss_sample_focus_0.75_in_json.json"
+                model_w_file = "model_2020-01-11-21-07-12_winAndLoss_sample_focus_0.75_weights.h5"
+
+                #
+                model_json_file = "model_2020-01-12-08-47-16_winAndLoss_sample_focus_0.749_in_json.json"
+                model_w_file = "model_2020-01-12-08-47-16_winAndLoss_sample_focus_0.749_weights.h5"
+
+                #model_w_file ="model_2020-01-12-18-59-53_winAndLoss_sample_focus_0.71_weights.h5"
+                #model_json_file = "model_2020-01-12-18-59-53_winAndLoss_sample_focus_0.71_in_json.json"
+
+                # Done -- 1K weighted for preventing lose
+                #model_w_file = "model_2020-01-12-19-29-34_winAndLoss_Loss1KWeights_sample_focus_0.70_weights.h5"
+                #model_json_file = "model_2020-01-12-19-29-34_winAndLoss_Loss1KWeights_sample_focus_0.70_in_json.json"
+
+                # Done
+                model_w_file = "model_2020-01-12-21-02-40_winAndLoss_sample_focus_0.733_weights.h5"
+                model_json_file = "model_2020-01-12-21-02-40_winAndLoss_sample_focus_0.733_in_json.json"
+
+                # DOne -- below are from a buggy weighting scheme..
+                model_json_file = "model_2020-01-12-21-40-17_winAndLoss_combinedWithUniq_sample_focus_0.649_in_json.json"
+                model_w_file ="model_2020-01-12-21-40-17_winAndLoss_combinedWithUniq_sample_focus_0.649_weights.h5"
+
+                # WORST SO FAR
+                model_w_file="model_2020-01-13-07-27-36_winAndLoss_combinedWithUniq_sample_focus_0.41_weights.h5"
+                model_json_file="model_2020-01-13-07-27-36_winAndLoss_combinedWithUniq_sample_focus_0.41_in_json.json"
+
+                # BEST SO FAR
+                model_json_file = "model_2020-01-13-21-02-40_winAndLoss_Loss1KWeights_sample_focus_0.718_in_json.json"
+                model_w_file = "model_2020-01-13-21-02-40_winAndLoss_Loss1KWeights_sample_focus_0.718_weights.h5"
+                # DONE
+                model_json_file = "model_2020-01-14-00-19-22_winAndLoss_combinedWithUniq_sample_focus_0.65_in_json.json"
+                model_w_file = "model_2020-01-14-00-19-22_winAndLoss_combinedWithUniq_sample_focus_0.65_weights.h5"
+                # DONE
+                #model_json_file = "model_2020-01-14-21-34-33_winAndLoss_withOneHotEncodeForLabel_sample_focus_0.7108_in_json.json"
+                #model_w_file = "model_2020-01-14-21-34-33_winAndLoss_withOneHotEncodeForLabel_sample_focus_0.7108_weights.h5"
+                model_obj = each_player.get_model_obj()
+                #self.model_based_policy = ModelPolicy(model_obj) #model_dir, model_w_file, model_json_file)
+                break
         self.game_id = uuid.uuid1()
 
 
@@ -108,13 +173,16 @@ class Game():
             canvas_for_drawing = Draw()
         is_draw_gametie = False
 
-        from model_loader import ModelBasedAgent
-        model_dir = "/Users/chihoon/works/mlBooks/introML/simple_template/AI4Fun/boardGames/analysis-tools/models_ex/"
-        model_w_file = model_dir + "current_best.h5" #"model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924weights.h5"
-        model_json_file = model_dir + "current_best.json" #model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924in_json.json"
-        model_agent_obj = ModelBasedAgent(model_w_file, model_json_file)
-        mlModel = model_agent_obj.get_model()
 
+        """
+        # Below block must be gone
+        # from model_loader import ModelBasedAgent
+        # model_dir = "./analysis-tools/models_ex/"
+        # model_w_file = model_dir + "current_best.h5" #"model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924weights.h5"
+        # model_json_file = model_dir + "current_best.json" #model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924in_json.json"
+        # model_agent_obj = ModelBasedAgent(model_w_file, model_json_file)
+        # mlModel = model_agent_obj.get_model()
+        """
         while self.check_end_status(self.turn) != True:
             print(self.board)
             test_instance = self.board.convert_sequence_moves_to_vector()
@@ -126,30 +194,30 @@ class Game():
 
                 #test_instance = np.array([an_instance])
 
-                prediction_move = mlModel.predict_proba(test_instance)[0]
-                pp = model_agent_obj.predict_proba(test_instance)[0]
-                UT.print_three_arrays(test_instance[0], pp, prediction_move)
-                move_by_prediction = np.argmax(pp) + 1
-                r_e, c_e = self.board.indices_to_coordinate(move_by_prediction)
-
+                #prediction_move = mlModel.predict_proba(test_instance)[0]
+                #pp = model_agent_obj.predict_proba(test_instance)[0]
+                #UT.print_three_arrays(test_instance[0], pp, prediction_move)
+                #move_by_prediction = np.argmax(pp) + 1
+                #r_e, c_e = self.board.indices_to_coordinate(move_by_prediction)
+                #print("R:%d C:%d \t i_e:%d R_e:%d C_e:%d" % (r_v, c_v, move_by_prediction, r_e, c_e))
                 r_v, c_v = self.validate_input()
-                print("R:%d C:%d \t i_e:%d R_e:%d C_e:%d" % (r_v, c_v, move_by_prediction, r_e, c_e))
+
             else:  # when Player is an agent
                 if self.turn.get_policy_mode() == "MODEL":
-                    r_v, c_v = self.model_based_policy.move(self.board)
+                    r_v, c_v = self.turn.model_based_policy.move(self.board)
                 elif self.turn.get_policy_mode() == "MCTS":
                     if self.turn.get_marker() == "O":
                         r_v, c_v = self.mctsObj_O.move(self.board)
                         # TODO -- this part is just to make a simplified interface of modelbased movement
                         # This could be a place for ModelBased action
                     elif self.turn.get_marker() == "X":
-                        if self.turn.get_policy_mode() == "Random":
+                        if self.turn.get_policy_mode() == "RANDOM":
                             self.random_policy = RandomPolicy()
                             r_v, c_v = self.random_policy.move(self.board)
                             # print("AM I HERE FOR RANDOM")
                         else:
                             r_v, c_v = self.mctsObj_X.move(self.board)
-                elif self.turn.get_policy_mode() == "Random":
+                elif self.turn.get_policy_mode() == "RANDOM":
                     self.random_policy = RandomPolicy()
                     r_v, c_v = self.random_policy.move(self.board)
 
@@ -249,11 +317,12 @@ class Game():
 
 
 ## since this is the simulation based, we will use agent vs agent
-def run_n_simulations(n):
+def run_n_simulations(n, output_filename_postfix=None):
+    fname = run_n_simulations.__name__
     board_size = 3
     num_connected = 3
     for i in range(n):
-        p1 = Player("white", "X", Player.PTYPE_AGENT)
+        p1 = Player("white", "X", Player.PTYPE_AGENT, "RANDOM")
         p2 = Player("black", "O", Player.PTYPE_AGENT)
         players = [p1, p2]
         first_turn_id = 0  # np.random.choice([0, 1])
@@ -261,11 +330,12 @@ def run_n_simulations(n):
         each_game = Game(players, first_turn_id, board)
         each_game.show_progress_on_canvas(False)
         json_str  = each_game.play_game()
-        UT.write_json_to_file(json_str)
+        UT.write_json_to_file(json_str, fname) #output_filename_postfix)
         p1.reset()
         p2.reset()
 
 def human_vs_MCTS():
+    fname = human_vs_MCTS.__name__
     board_size = 3
     num_connected = 3
     p1 = Player("black", "X", Player.PTYPE_HUMAN)
@@ -276,53 +346,148 @@ def human_vs_MCTS():
     each_game = Game(players, 0, board)
     each_game.show_progress_on_canvas(True)
     json_str  = each_game.play_game()
-    UT.write_json_to_file(json_str)
+    UT.write_json_to_file(json_str, fname)
 
-def MCTS_vs_MODEL(n):
+
+def MCTS_vs_RANDOM(n):
+    fname = MCTS_vs_RANDOM.__name__
 
     board_size = 3
     num_connected = 3
 
     for i in range(n):
-        p1 = Player("black", "X", Player.PTYPE_AGENT, "MCTS")
+        p1 = Player("black", "X", Player.PTYPE_AGENT, "RANDOM")
         #p2 = Player("white", "O", Player.PTYPE_HUMAN)
-        p2 = Player("white", "O", Player.PTYPE_AGENT, "MODEL")
+        p2 = Player("white", "O", Player.PTYPE_AGENT, "MCTS")
         players = [p1, p2]
         board = Board(board_size, board_size, num_connected)
         each_game = Game(players, 0, board)
         each_game.show_progress_on_canvas(False)
         json_str  = each_game.play_game()
-        UT.write_json_to_file(json_str)
+        UT.write_json_to_file(json_str, fname, "random_begin_first")
         p1.reset()
         p2.reset()
 
-def MCTS_vs_MCTS():
+
+def MCTS_vs_MODEL(n):
+    fname = MCTS_vs_MODEL.__name__
+
     board_size = 3
     num_connected = 3
-    p1 = Player("black", "X", Player.PTYPE_AGENT)
-    p2 = Player("white", "O", Player.PTYPE_AGENT)
+
+    config_for_model = model_config.config_for_model_j
+
+    for i in range(n):
+        p1 = Player("black", "X", Player.PTYPE_AGENT, "MCTS")
+        #p2 = Player("white", "O", Player.PTYPE_HUMAN)
+        p2 = Player("white", "O", Player.PTYPE_AGENT, "MODEL")
+        p2.set_model_info(config_for_model)
+        players = [p1, p2]
+        board = Board(board_size, board_size, num_connected)
+        each_game = Game(players, 0, board)
+        each_game.show_progress_on_canvas(False)
+        json_str  = each_game.play_game()
+        UT.write_json_to_file(json_str, fname, config_for_model.get("model_name"))
+        p1.reset()
+        p2.reset()
+
+def RANDOM_vs_MODEL(n):
+    fname = RANDOM_vs_MODEL.__name__
+
+    board_size = 3
+    num_connected = 3
+
+    #model_json="model_2020-01-17-23-24-05_winAndLoss_combinedWithUniq_sample_focus_0.65_in_json.json",
+    #model_h5="model_2020-01-17-23-24-05_winAndLoss_combinedWithUniq_sample_focus_0.65_weights.h5",
+
+
+    current_model = model_config.config_for_model_k
+
+    for i in range(n):
+        p1 = Player("black", "X", Player.PTYPE_AGENT, "RANDOM")
+        #p2 = Player("white", "O", Player.PTYPE_HUMAN)
+        p2 = Player("white", "O", Player.PTYPE_AGENT, "MODEL")
+        p2.set_model_info(current_model)
+        players = [p1, p2]
+        board = Board(board_size, board_size, num_connected)
+        each_game = Game(players, 0, board)
+        each_game.show_progress_on_canvas(False)
+        json_str  = each_game.play_game()
+        UT.write_json_to_file(json_str, fname, current_model['model_name'])
+        p1.reset()
+        p2.reset()
+def Human_vs_MODEL():
+    fname = Human_vs_MODEL.__name__
+    board_size = 3
+    num_connected = 3
+
+    current_model = model_config.config_for_model_j
+
+    p1 = Player("black", "O", Player.PTYPE_AGENT, "MODEL")
+    p1.set_model_info(current_model)
+    p2 = Player("white", "X", Player.PTYPE_HUMAN)
+    players = [p1, p2]
+    board = Board(board_size, board_size, num_connected)
+    each_game = Game(players, 0, board)
+    each_game.show_progress_on_canvas(True)
+    json_str  = each_game.play_game()
+    UT.write_json_to_file(json_str, fname, current_model.get("model_name"))
+    p1.reset()
+    p2.reset()
+
+def MCTS_vs_MCTS():
+    fname = run_n_simulations.__name__
+
+    board_size = 3
+    num_connected = 3
+    p1 = Player("black", "X", Player.PTYPE_AGENT, "MCTS")
+    p2 = Player("white", "O", Player.PTYPE_AGENT, "MCTS")
 
     players = [p1, p2]
     board = Board(board_size, board_size, num_connected)
     each_game = Game(players, 0, board)
     each_game.show_progress_on_canvas(True)
     json_str  = each_game.play_game()
-    UT.write_json_to_file(json_str)
+    UT.write_json_to_file(json_str, fname)
+
+
 
 def humans_vs_model_agent():
     pass
+
+
+def parse_arguments(a_parser):
+    a_parser.add_argument('-mode', type=int, required=True,
+                          help="1 for Play; 2 for load a game ")
+    a_parser.add_argument('-p', type=int, help="1 for MCTS vs Model; 2 for simulation ")
+    a_parser.add_argument('-n', type=int, help="number of simulations")
+    args = a_parser.parse_args()
+
+    return args
+
+
+
+
 DO_PLAY = 1
 LOAD_PLAY = 2
 
 if __name__ == "__main__":
+    #parser = argparse.ArgumentParser()
+    #args = parse_arguments(parser)
+    #print(args)
+    GAME_MODE = DO_PLAY
+    #GAME_MODE = LOAD_PLAY
 
-    #GAME_MODE = DO_PLAY
-    GAME_MODE = LOAD_PLAY
+
     if GAME_MODE == DO_PLAY:
-        #run_n_simulations(100000)
+        #RANDOM_vs_MODEL(1000)
+
+        Human_vs_MODEL()
+        #run_n_simulations(3, "random_vs_mcts")
         #human_vs_MCTS()
-        MCTS_vs_MODEL(200)
+        #MCTS_vs_MODEL(100)
         #MCTS_vs_MCTS()
+        #MCTS_vs_RANDOM(500)
     elif GAME_MODE == LOAD_PLAY:
         all_games = UT.read_games("./game_output.log")
         sampled_games = np.random.choice(all_games, 3)

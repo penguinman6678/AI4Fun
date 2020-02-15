@@ -6,7 +6,9 @@ import sys
 from os import path
 
 class ModelBasedAgent():
-    def __init__(self, filename_for_model, filename_for_json):
+    def __init__(self, model_dir, filename_for_model_p, filename_for_json_p):
+        filename_for_json = model_dir + "/" + filename_for_json_p
+        filename_for_model = model_dir + "/" + filename_for_model_p
         if not path.exists(filename_for_model):
             print("%s does not exist. Check again"
                   % (filename_for_model))

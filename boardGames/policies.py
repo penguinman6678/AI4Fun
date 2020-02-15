@@ -15,7 +15,7 @@ import operator
 import networkx as nx
 import copy
 from board import Board
-from model_loader import ModelBasedAgent
+#from model_loader import ModelBasedAgent
 import utils as UT
 
 EPSILON = 10e-6  # Prevents division by 0 in calculation of UCT
@@ -38,21 +38,31 @@ class RandomPolicy(Policy):
         # return np.random.choice(state.legal_moves())
 
 class ModelPolicy(Policy):
-    def __init__(self, model_dir, model_weight_file, model_json_file):
-        # "/Users/chihoon/works/mlBooks/introML/simple_template/AI4Fun/boardGames/analysis-tools/models_ex/"
-        model_dir = model_dir
-        # "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924weights.h5"
-        self.model_weight_file = model_dir + model_weight_file
-        # "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924in_json.json"
-        self.model_json_file = model_dir + model_json_file
-        self.model_agent_obj = ModelBasedAgent(self.model_weight_file, self.model_json_file)
+    #def __init__(self, model_dir, model_weight_file, model_json_file):
+    def __init__(self, model_obj):
+        #### "/Users/chihoon/works/mlBooks/introML/simple_template/AI4Fun/boardGames/analysis-tools/models_ex/"
+        #model_dir = model_dir
+        ### "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924weights.h5"
+        #self.model_weight_file = model_dir + model_weight_file
+        #### "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924in_json.json"
+        #self.model_json_file = model_dir + model_json_file
+        self.model_agent_obj = model_obj #ModelBasedAgent(self.model_weight_file, self.model_json_file)
         self.DEBUG = True
     def set_debug(self, a_flag):
         self.DEBUG = a_flag
     def move(self, state):
         test_instance = state.convert_sequence_moves_to_vector()
-        print(test_instance)
-        predicted_move = self.model_agent_obj.predict_proba(test_instance)[0]
+        #print(test_instance) // type of ndarray
+
+        ## below is for two-tower
+        #predicted_move = self.model_agent_obj.predict([test_instance, test_instance])[0]
+        ## below is for regular model
+        # predicted_move = self.model_agent_obj.predict_proba(test_instance)[0]
+
+        # for conv2d
+        x_test = test_instance.reshape(1, 3, 3, 1)
+        predicted_move = self.model_agent_obj.predict_proba(x_test)[0]
+
         ####pp = self.model_agent_obj.predict_proba(test_instance)[0]
         if self.DEBUG:
             UT.print_three_arrays(test_instance[0], predicted_move, predicted_move)
@@ -73,7 +83,24 @@ class ModelPolicy(Policy):
         return r, c
     def move_validate(self, state, a_vec_estimated):
         legal_moves = state.legal_moves()
+        ## HACK
+        #best_move_from_history_rule = (1, 1)
+        #if best_move_from_history_rule in legal_moves:
+        #    return 1, 1, 1
 
+        # if this is the first move, then draw a sample from dirchlet
+        if len(legal_moves) == state.row * state.col:
+            a_dir_prob = np.random.dirichlet(a_vec_estimated, 1)[0]
+            try_outcome = np.random.multinomial(100, list(a_dir_prob))
+            best_order = (-a_vec_estimated).argsort()[0]
+            r, c = state.indices_to_coordinate(best_order + 1)
+            ## or
+            best_order = 4
+            r, c = 1, 1 #state.indices_to_coordinate(best_order+1)
+            return r, c, best_order+1
+
+        print("^^^^^^^^^^^^^")
+        print(a_vec_estimated)
         for best_order in (-a_vec_estimated).argsort()[:]:
             r, c = state.indices_to_coordinate(best_order+1)
             if (r,c) in legal_moves:

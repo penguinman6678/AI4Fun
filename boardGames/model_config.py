@@ -46,7 +46,7 @@ config_for_model_g = dict(
         model_name="model_from_conv2_g"
     )
 
-# Conv2D model 3
+# Conv2D model 3 with kernel (3,1 )
 config_for_model_h = dict(
         model_dir="./train_model/models_ex/",
         model_json="model_2020-02-04-22-32-21_winAndLoss_all_with_conv2D-0.88_in_json.json",
@@ -54,11 +54,43 @@ config_for_model_h = dict(
         model_name="model_from_conv2_h"
     )
 
-# Conv2D model 3
+# Conv2D model 4 with kernel (1,3)
 config_for_model_i = dict(
         model_dir="./train_model/models_ex/",
         model_json="model_2020-02-08-11-14-06_winAndLoss_all_with_conv2D-0.61_in_json.json",
         model_h5="model_2020-02-08-11-14-06_winAndLoss_all_with_conv2D-0.61_weights.h5",
         model_name="model_from_config_conv2_i"
+    )
+
+# Conv2D model 4 with kernel (1,3)
+config_for_model_j = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-08-22-43-57_winAndLoss_all_with_conv2D-0.72_in_json.json",
+        model_h5="model_2020-02-08-22-43-57_winAndLoss_all_with_conv2D-0.72_weights.h5",
+        model_name="model_from_config_conv2_j"
+    )
+
+# Conv2D model 4 with kernel (1,3)
+config_for_model_k = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-08-23-19-27_winAndLoss_all_with_conv2D-0.833_in_json.json",
+        model_h5="model_2020-02-08-23-19-27_winAndLoss_all_with_conv2D-0.833_weights.h5",
+        model_name="model_from_config_conv2_k"
+    )
+
+# Conv2D model 4 with kernel (1,3)
+config_for_model_l = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-09-16-33-37_winAndLoss_all_with_conv2D-0.789_in_json.json",
+        model_h5="model_2020-02-09-16-33-37_winAndLoss_all_with_conv2D-0.789_weights.h5",
+        model_name="model_from_config_conv2_l"
+    )
+
+# Conv2D model 4 with kernel (1,3)
+config_for_model_m = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-09-22-51-59_winAndLoss_all_with_conv2D-0.68_in_json.json",
+        model_h5="model_2020-02-09-22-51-59_winAndLoss_all_with_conv2D-0.68_weights.h5",
+        model_name="model_from_config_conv2_m"
     )
 
