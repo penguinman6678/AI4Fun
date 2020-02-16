@@ -5,6 +5,7 @@
 
 ### mp4 file
 - Based on a game log between two players, the mp4 file is to show the heat-map for a first move that lead to winning for a second player
+- To view the videos of the simulations, check out [my blog at bugbytelab.com](https://bugbytelab.com/2020/02/03/example-of-moves-from-an-agent-to-win-a-game/).
 
 #### Commands to run
 - game_output_1k_sample.log
