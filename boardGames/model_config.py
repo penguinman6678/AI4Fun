@@ -94,3 +94,46 @@ config_for_model_m = dict(
         model_name="model_from_config_conv2_m"
     )
 
+
+# Conv2D model 4 with kernel (1,3)
+config_for_model_n = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-15-16-10-05_winAndLoss_all_with_conv2D-0.79_in_json.json",
+        model_h5="model_2020-02-15-16-10-05_winAndLoss_all_with_conv2D-0.79_weights.h5",
+        model_name="model_from_config_conv2_n"
+    )
+
+# Conv2D model 4 with kernel (1,3)
+config_for_model_o = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-16-18-01-27_winAndLoss_all_with_conv2D-0.89_in_json.json",
+        model_h5="model_2020-02-16-18-01-27_winAndLoss_all_with_conv2D-0.89_weights.h5",
+        model_name="model_from_config_conv2_o"
+    )
+
+
+# Conv2D model 4 with kernel (1,3)
+config_for_model_p = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-17-17-29-34_winAndLoss_all_with_conv2D-0.842_in_json.json",
+        model_h5="model_2020-02-17-17-29-34_winAndLoss_all_with_conv2D-0.842_weights.h5",
+        model_name="model_from_config_conv2_p"
+    )
+
+# Conv2D model 4 with kernel (1,3)
+config_for_model_q = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-17-19-57-01_winAndLoss_all_with_conv2D-0.7895_in_json.json",
+        model_h5="model_2020-02-17-19-57-01_winAndLoss_all_with_conv2D-0.7895_weights.h5",
+        model_name="model_from_config_conv2_q"
+    )
+
+
+# Conv2D and TwoTowers model 4 with kernel (1,3)
+config_for_model_r = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-22-16-12-32_conv2D-twoTower_all-0.7894_in_json.json",
+        model_h5="model_2020-02-22-16-12-32_conv2D-twoTower_all-0.7894_weights.h5",
+        model_name="model_from_config_conv2_r"
+    )
+

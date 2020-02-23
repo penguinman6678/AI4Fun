@@ -204,7 +204,8 @@ class Game():
 
             else:  # when Player is an agent
                 if self.turn.get_policy_mode() == "MODEL":
-                    r_v, c_v = self.turn.model_based_policy.move(self.board)
+                    model_structure = 3 # 0 for regular, 1 for two tower, 2 for conv2d, 3 for conv2d+twoTowers
+                    r_v, c_v = self.turn.model_based_policy.move(self.board, model_structure)
                 elif self.turn.get_policy_mode() == "MCTS":
                     if self.turn.get_marker() == "O":
                         r_v, c_v = self.mctsObj_O.move(self.board)
@@ -375,7 +376,7 @@ def MCTS_vs_MODEL(n):
     board_size = 3
     num_connected = 3
 
-    config_for_model = model_config.config_for_model_j
+    config_for_model = model_config.config_for_model_o
 
     for i in range(n):
         p1 = Player("black", "X", Player.PTYPE_AGENT, "MCTS")
@@ -401,7 +402,7 @@ def RANDOM_vs_MODEL(n):
     #model_h5="model_2020-01-17-23-24-05_winAndLoss_combinedWithUniq_sample_focus_0.65_weights.h5",
 
 
-    current_model = model_config.config_for_model_k
+    current_model = model_config.config_for_model_r
 
     for i in range(n):
         p1 = Player("black", "X", Player.PTYPE_AGENT, "RANDOM")
@@ -421,7 +422,7 @@ def Human_vs_MODEL():
     board_size = 3
     num_connected = 3
 
-    current_model = model_config.config_for_model_j
+    current_model = model_config.config_for_model_m
 
     p1 = Player("black", "O", Player.PTYPE_AGENT, "MODEL")
     p1.set_model_info(current_model)
@@ -480,9 +481,9 @@ if __name__ == "__main__":
 
 
     if GAME_MODE == DO_PLAY:
-        #RANDOM_vs_MODEL(1000)
+        RANDOM_vs_MODEL(4000)
 
-        Human_vs_MODEL()
+        #Human_vs_MODEL()
         #run_n_simulations(3, "random_vs_mcts")
         #human_vs_MCTS()
         #MCTS_vs_MODEL(100)

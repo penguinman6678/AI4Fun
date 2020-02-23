@@ -50,18 +50,24 @@ class ModelPolicy(Policy):
         self.DEBUG = True
     def set_debug(self, a_flag):
         self.DEBUG = a_flag
-    def move(self, state):
+    def move(self, state, option_for_pred_structure=2):
         test_instance = state.convert_sequence_moves_to_vector()
         #print(test_instance) // type of ndarray
 
-        ## below is for two-tower
-        #predicted_move = self.model_agent_obj.predict([test_instance, test_instance])[0]
         ## below is for regular model
-        # predicted_move = self.model_agent_obj.predict_proba(test_instance)[0]
-
-        # for conv2d
-        x_test = test_instance.reshape(1, 3, 3, 1)
-        predicted_move = self.model_agent_obj.predict_proba(x_test)[0]
+        if option_for_pred_structure == 0:
+            predicted_move = self.model_agent_obj.predict_proba(test_instance)[0]
+        ## below is for two-tower
+        elif option_for_pred_structure == 1:
+            predicted_move = self.model_agent_obj.predict([test_instance, test_instance])[0]
+        elif option_for_pred_structure == 2:
+            # for conv2d
+            x_test = test_instance.reshape(1, 3, 3, 1)
+            predicted_move = self.model_agent_obj.predict_proba(x_test)[0]
+        elif option_for_pred_structure == 3:
+            # for conv2d and Two-Tower
+            x_test = test_instance.reshape(1, 3, 3, 1)
+            predicted_move = self.model_agent_obj.predict(x_test)[0]
 
         ####pp = self.model_agent_obj.predict_proba(test_instance)[0]
         if self.DEBUG:
@@ -86,17 +92,21 @@ class ModelPolicy(Policy):
         ## HACK
         #best_move_from_history_rule = (1, 1)
         #if best_move_from_history_rule in legal_moves:
-        #    return 1, 1, 1
+        #    return 1, 1, 5
 
         # if this is the first move, then draw a sample from dirchlet
         if len(legal_moves) == state.row * state.col:
-            a_dir_prob = np.random.dirichlet(a_vec_estimated, 1)[0]
-            try_outcome = np.random.multinomial(100, list(a_dir_prob))
-            best_order = (-a_vec_estimated).argsort()[0]
-            r, c = state.indices_to_coordinate(best_order + 1)
-            ## or
-            best_order = 4
-            r, c = 1, 1 #state.indices_to_coordinate(best_order+1)
+            dri_on = False
+            if dri_on:
+                a_dir_prob = np.random.dirichlet(a_vec_estimated, 1)[0]
+                try_outcome = np.random.multinomial(100, list(a_dir_prob))
+                best_order = (-a_vec_estimated).argsort()[0]
+                r, c = state.indices_to_coordinate(best_order + 1)
+                ## or
+            else:
+                idx = np.random.randint(len(legal_moves))
+                best_order = idx-1
+                r, c = legal_moves[idx]  #state.indices_to_coordinate(best_order+1)
             return r, c, best_order+1
 
         print("^^^^^^^^^^^^^")
