@@ -15,6 +15,7 @@ $>python3 game.py
 #### Update
 |Date | Summary|
 | ------ | ------ |
+|Feb 22 2020 | Updating model_config.py file which defile a model and load the model for the gaem |
 |Feb 02 2020 | Updating the game_data_load_parse.py tool under analysis-tools directory to summarize a game result|
 |Jan 04 2020 | Adding analysis tools under analysis-tools directory which produces training data samples from the simulations runs|
 |Nov 29 2019 | game.py has a simulation between agents with MCTS. This can be considered as V0.5 of MCTS policy  |
