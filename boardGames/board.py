@@ -62,7 +62,7 @@ class Board():
         self.available_position[(r,c)] = 0
 
     def convert_sequence_moves_to_vector(self):
-        individual_sequence = [0] * 9
+        individual_sequence = [0] * (self.row * self.col)
         for item in self.sequences_of_movements:
             turn_for_this_move = item.get("turn")
             move_made_for_this_move = item.get("position")
@@ -290,8 +290,9 @@ class Board():
 
 ## to test class Board...
 if __name__ == "__main__":
-    board = Board(3, 3, 3)
+    board = Board(5, 5, 5)
     print(board)
+    from player import Player
     p1 = Player("white", "O")
     p2 = Player("black", "X")
 
@@ -305,4 +306,7 @@ if __name__ == "__main__":
     board.set_a_move(1, 2, p1)
     print(board)
 
+    board.set_a_move(1, 3, p1)
+    board.set_a_move(1, 4, p1)
+    print(board)
     print(board.is_win(p1))
