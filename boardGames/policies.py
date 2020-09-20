@@ -40,7 +40,7 @@ class RandomPolicy(Policy):
 class ModelPolicy(Policy):
     #def __init__(self, model_dir, model_weight_file, model_json_file):
     def __init__(self, model_obj):
-        #### "/Users/chihoon/works/mlBooks/introML/simple_template/AI4Fun/boardGames/analysis-tools/models_ex/"
+        
         #model_dir = model_dir
         ### "model_2020-01-09-15-15-06_BEST_SO_FAR_WITH_Early_Stop-0.90-upto2-0.924weights.h5"
         #self.model_weight_file = model_dir + model_weight_file
