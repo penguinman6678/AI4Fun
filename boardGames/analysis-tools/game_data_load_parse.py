@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import sys
 
-sys.path.insert(0, "/Users/chihoon/works/mlBooks/introML/simple_template/AI4Fun/boardGames/")
+sys.path.insert(0, "../../AI4Fun/boardGames/")
 import matplotlib.animation as animation
 
 ## belows are for libs cooked by me
@@ -312,17 +312,20 @@ def parse_jsons_example(filename):
         # 1) create an-empty list for init-game
         # 2) create list of list
 
-        dict_move_set = {}
-        dict_move_set["move_sequence"] = None
-        dict_move_set["player_winner"] = None
 
-        individual_sequence = ["_"] * 9
-        list_of_individual_sequence = []
 
         ## each i holds a game log, which is represented in a dictionary format
         each_game_in_a_json = games_in_jsons[i]
         # once you have a dictionary obj, you can retrieve a value for a key by
         # adict.get("mykey") <-- adict is a dictionary obj; "mykey" is a key name000
+
+        dict_move_set = {}
+        dict_move_set["move_sequence"] = None
+        dict_move_set["player_winner"] = None
+        board_size = each_game_in_a_json.get("board_size", 5)
+        individual_sequence = ["_"] * (board_size**2)
+        list_of_individual_sequence = []
+
 
         player_winner = each_game_in_a_json.get("winner")
         moves_in_sequence_per_game = each_game_in_a_json.get("sequence")
@@ -465,6 +468,7 @@ if __name__ == "__main__":
         print_training_samples(training_samples, output_dir  + pre_fix + "_samples_all_training.txt")
         print_training_samples(focused_samples[0], output_dir + pre_fix + "_samples_to_enhance_winning.txt")
         print_training_samples(focused_samples[1], output_dir + pre_fix + "_samples_to_prevent_losing.txt")
+
     else:
         winning_stats_dict, move_tree, averaged_moves, first_move_stats = analyze_game(file_name)
         pretty_print_wining_stats(winning_stats_dict)
