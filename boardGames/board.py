@@ -227,10 +227,11 @@ class Board():
         for index in range(self.number_of_connected_tobe_win - 1):
             estimated_next_value = focused_index + (index + 1) * (c + 1)
             r_e, c_e = self.indices_to_coordinate(estimated_next_value)
-            if row_for_focused_index == r_e or r_e != (index+1):
+            if row_for_focused_index == r_e or r_e != (row_for_focused_index+1):
                 flag_win = False
                 return flag_win
             if estimated_next_value in a_list_in_dict:
+                row_for_focused_index = r_e # now we are moving to see a next component
                 so_far_connected +=1
             if so_far_connected == self.number_of_connected_tobe_win:
                 flag_win = True
@@ -247,10 +248,11 @@ class Board():
         for index in range(self.number_of_connected_tobe_win - 1):
             estimated_next_value = focused_index + (index + 1) * (c - 1)
             r_e, c_e = self.indices_to_coordinate(estimated_next_value)
-            if row_for_focused_index == r_e or r_e != (index+1): # note that r_e must to be index+1 as it needs to be in next row.
+            if row_for_focused_index == r_e or r_e != (row_for_focused_index+1): # note that r_e must to be index+1 as it needs to be in next row.
                 flag_win = False
                 return flag_win
             if estimated_next_value in a_list_in_dict:
+                row_for_focused_index = r_e # now we are moving to see a next component
                 so_far_connected +=1
 
             if so_far_connected == self.number_of_connected_tobe_win:

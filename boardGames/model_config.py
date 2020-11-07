@@ -137,3 +137,78 @@ config_for_model_r = dict(
         model_name="model_from_config_conv2_r"
     )
 
+# Conv2D and TwoTowers model 4 with kernel (1,3)
+config_for_model_s = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-23-14-52-24_conv2D-twoTower_all-0.842_in_json.json",
+        model_h5="model_2020-02-23-14-52-24_conv2D-twoTower_all-0.842_weights.h5",
+        model_name="model_from_config_conv2_s"
+    )
+
+# Conv2D and TwoTowers model 4 with kernel (1,3)
+config_for_model_t = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-02-23-19-43-02_conv2D-twoTower_all-0.7368_in_json.json",
+        model_h5="model_2020-02-23-19-43-02_conv2D-twoTower_all-0.7368_weights.h5",
+        model_name="model_from_config_conv2_t"
+    )
+
+# Conv2D and TwoTowers model 4 with kernel (1,3)
+config_for_model_u = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-03-10-22-48-24_conv2D-twoTower_all-0.894_Top2_in_json.json",
+        model_h5="model_2020-03-10-22-48-24_conv2D-twoTower_all-0.894_Top2_weights.h5",
+        model_name="model_from_config_conv2_u"
+    )
+
+# Conv2D and TwoTowers model 4 with kernel (1,3) == on Oct 8 2020
+config_for_model_v = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-10-04-22-28-25_conv2D-twoTower_all-0.7894_in_json.json",
+        model_h5="model_2020-10-04-22-28-25_conv2D-twoTower_all-0.7894_weights.h5",
+        model_name="model_from_config_conv2_v"
+    )
+
+# Conv2D and TwoTowers model 4 with kernel (1,3) == on Oct 8 2020
+config_for_model_5by5_v0 = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-10-29-16-40-22_conv2D-twoTower_all_boardSize25_0.7894-k2_1.00_in_json.json",
+        model_h5="model_2020-10-29-16-40-22_conv2D-twoTower_all_boardSize25_0.7894-k2_1.00_weights.h5",
+        model_name="model_from_config_conv2_5by5"
+    )
+
+## 5 by 5 trained using winning data
+config_for_model_5by5_v1 = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-10-31-22-07-39_conv2D-twoTower_winingFocusedTrainingData_boardSize_25_in_json.json",
+        model_h5="model_2020-10-31-22-07-39_conv2D-twoTower_winingFocusedTrainingData_boardSize_25_weights.h5",
+        model_name="model_from_config_conv2_5by5_winningOnly_v1"
+    )
+## 5 by 5 trained using winning data
+config_for_model_5by5_v2 = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-11-01-15-01-21_conv2D-twoTower_winingFocusedTrainingData_boardSize_25_in_json.json",
+        model_h5="model_2020-11-01-15-01-21_conv2D-twoTower_winingFocusedTrainingData_boardSize_25_weights.h5",
+        model_name="model_from_config_conv2_5by5_winningOnly_v2"
+    )
+
+## 5 by 5 trained using winning and losing data
+config_for_model_5by5_winAndLoss_v3 = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="model_2020-11-01-23-43-46_conv2D-twoTower_winingAndLossFocusedTrainingData_boardSize_25_in_json.json",
+        model_h5="model_2020-11-01-23-43-46_conv2D-twoTower_winingAndLossFocusedTrainingData_boardSize_25_weights.h5",
+        model_name="model_from_config_conv2_5by5_winningAndLossData_v3"
+    )
+
+
+
+
+# Conv2D and TwoTowers model 4 with kernel (1,3)
+# Below shows errorr
+config_for_model_test = dict(
+        model_dir="./train_model/models_ex/",
+        model_json="current_best.json",
+        model_h5="current_best.h5",
+        model_name="model_from_config_conv2_u"
+    )
+

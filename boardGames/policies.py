@@ -33,7 +33,8 @@ class RandomPolicy(Policy):
     def move(self, state):
         """Chooses moves randomly from the legal moves in a given state"""
         legal_moves = state.legal_moves()
-        idx = np.random.randint(len(legal_moves))
+
+        idx = np.random.RandomState().randint(len(legal_moves))
         return legal_moves[idx]
         # return np.random.choice(state.legal_moves())
 
@@ -52,7 +53,7 @@ class ModelPolicy(Policy):
         self.DEBUG = a_flag
     def move(self, state, option_for_pred_structure=2):
         test_instance = state.convert_sequence_moves_to_vector()
-        #print(test_instance) // type of ndarray
+        #print(test_instance) #// type of ndarray
 
         ## below is for regular model
         if option_for_pred_structure == 0:
@@ -62,16 +63,17 @@ class ModelPolicy(Policy):
             predicted_move = self.model_agent_obj.predict([test_instance, test_instance])[0]
         elif option_for_pred_structure == 2:
             # for conv2d
-            x_test = test_instance.reshape(1, 3, 3, 1)
+            x_test = test_instance.reshape(1, state.row, state.col, 1)
+
             predicted_move = self.model_agent_obj.predict_proba(x_test)[0]
         elif option_for_pred_structure == 3:
             # for conv2d and Two-Tower
-            x_test = test_instance.reshape(1, 3, 3, 1)
+            x_test = test_instance.reshape(1, state.row, state.col, 1)
             predicted_move = self.model_agent_obj.predict(x_test)[0]
 
         ####pp = self.model_agent_obj.predict_proba(test_instance)[0]
         if self.DEBUG:
-            UT.print_three_arrays(test_instance[0], predicted_move, predicted_move)
+            UT.print_three_arrays(test_instance[0], predicted_move, predicted_move, state.row)
         #mv_indx = np.argmax(predicted_move) + 1  # very important by adding 1
         #r, c = state.indices_to_coordinate(mv_indx)
         r, c, i_v = self.move_validate(state, predicted_move)
@@ -110,7 +112,7 @@ class ModelPolicy(Policy):
             return r, c, best_order+1
 
         print("^^^^^^^^^^^^^")
-        print(a_vec_estimated)
+        print(np.around(a_vec_estimated, decimals=3))
         for best_order in (-a_vec_estimated).argsort()[:]:
             r, c = state.indices_to_coordinate(best_order+1)
             if (r,c) in legal_moves:
@@ -121,7 +123,7 @@ class ModelPolicy(Policy):
 
 class MCTSPolicy(Policy):
 
-    def __init__(self, playerObj, opponentPlayer, uct_flag=0):
+    def __init__(self, playerObj, opponentPlayer, uct_flag=0, board=None):
         """
         Implementation of Monte Carlo Tree Search
 
@@ -153,7 +155,9 @@ class MCTSPolicy(Policy):
 
         self.node_counter = 0
 
-        empty_board = Board(3, 3, 3)
+        empty_board = None #Board(3, 3, 3)
+        if board:
+            empty_board = Board(board.row, board.col, board.number_of_connected_tobe_win)
         self.digraph.add_node(self.node_counter, attr_dict={'w': 0,
                                                             'n': 0,
                                                             'uct': 0,

@@ -20,6 +20,13 @@ import json
 
 import argparse
 
+import threading
+global_lock = threading.Lock()
+from time import sleep
+from datetime import datetime
+import os.path
+
+
 log_output_dir = "./log_outs/"
 
 class Game():
@@ -365,12 +372,33 @@ def Human_vs_Human():
     json_str  = each_game.play_game()
     UT.write_json_to_file(json_str, fname)
 
-def RANDOM_vs_MCTS_bigger_board(n):
-    fname = RANDOM_vs_MCTS_bigger_board.__name__
+
+def write_json_to_file_lock(json_st, filename_prefix=None, filename_postfix=None):
+    while global_lock.locked():
+        sleep(0.01)
+
+    try:
+        outputname = "game_output_thread"
+        if filename_prefix != None:
+            outputname = "threads_" + filename_prefix + "_" + outputname
+        outputname = log_output_dir + "/{0}_{1}.log".format(outputname, filename_postfix)
+        output_rule_to_append_or_create = 'w'
+        if os.path.isfile(outputname):
+            output_rule_to_append_or_create = 'a'
+        with open(outputname, output_rule_to_append_or_create) as fd:
+            json.dump(json_st, fd)
+            fd.write("\n")
+            fd.close()
+    finally:
+        if global_lock.locked():
+            global_lock.release()
+
+def RANDOM_vs_MCTS_bigger_board_thread(n, seed_idx=0):
+    fname = RANDOM_vs_MCTS_bigger_board_thread.__name__
 
     board_size = 5
     num_connected = 4
-
+    print("A simulation is started\n")
     for i in range(n):
         p1 = Player("black", "X", Player.PTYPE_AGENT, "RANDOM")
         #p2 = Player("white", "O", Player.PTYPE_HUMAN)
@@ -381,7 +409,7 @@ def RANDOM_vs_MCTS_bigger_board(n):
         each_game.show_progress_on_canvas(False)
         json_str  = each_game.play_game()
         tag_for_filename = "random_begin_first_MCTS_bigger_board_4connected"
-        UT.write_json_to_file(json_str, fname, tag_for_filename)
+        write_json_to_file_lock(json_str, fname, tag_for_filename)
         p1.reset()
         p2.reset()
     print("Simulation is done in %s" %fname)
@@ -554,6 +582,7 @@ def parse_arguments(a_parser):
 
 DO_PLAY = 1
 LOAD_PLAY = 2
+import multiprocessing
 
 
 if __name__ == "__main__":
@@ -571,10 +600,24 @@ if __name__ == "__main__":
         #RANDOM_vs_MODEL_bigger_board(10000)
         #Human_vs_MODEL_bigger_board()  # working with 5 by 5
         #Human_vs_Human()
-
+        threads = []
+        procs = []
         if args.sim == 1:
             print("Starting simulation of Ramdom_MCTS_bigger_board -- %d times" % args.n)
-            RANDOM_vs_MCTS_bigger_board(args.n)
+            start_time = time.time()
+            for i in range(10):
+                #t = threading.Thread(target=RANDOM_vs_MCTS_bigger_board_thread, args=(args.n,))
+                #threads.append(t)
+                #t.start()
+                t = multiprocessing.Process(target=RANDOM_vs_MCTS_bigger_board_thread, args=(args.n,))
+                time.sleep(1)
+                procs.append(t)
+                t.start()
+
+            print("Elapsed time: %d" % (time.time()-start_time))
+            #[proc.join() for proc in threads]
+            [proc.join() for proc in procs]
+
         #run_n_simulations(3, "random_vs_mcts")
         #human_vs_MCTS()
         #MCTS_vs_MODEL(1000)

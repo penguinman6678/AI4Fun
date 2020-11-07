@@ -13,12 +13,13 @@ import utils as UT
 
 def parse_history(adict):
     winner = adict.get("winner", None)
+    board_size = adict.get("board_size", 5)
     if winner == None:
         print("Something is wrong")
         sys.exit(1)
     move_sequences = adict.get("sequence", None)
 
-    board_obj_from_history = Board(3, 3, 3)
+    board_obj_from_history = Board(5, 5, 3)
     # below obj is for drawing the board on a canvas.
     # if you don't like, you can make it comment
     draw_board_obj = Draw()
@@ -47,8 +48,8 @@ def analyze_game(file_name):
 """
 below function is deprecated by function animation_heatmap
 """
-def analyze_game_first_move_working_version_for_heatmap_animation(file_name):
-    a = np.zeros((3, 3))
+def analyze_game_first_move_working_version_for_heatmap_animation(file_name, board_size):
+    a = np.zeros((board_size, board_size))
     games = UT.read_games(file_name)
     first_move_stats_dict = {}
     T = 0
@@ -87,7 +88,7 @@ C = 0
 
 
 def animation_heatmap(file_name):
-    a = np.zeros((3, 3))
+
     games = UT.read_games(file_name)
     games_win_by_O = []
     Writer = animation.writers['ffmpeg']
@@ -96,33 +97,55 @@ def animation_heatmap(file_name):
     focused_result = "O"
     fig = plt.figure()
 
+
     skip_by = 1
     c_ = 0
+    board_size = 5
+    
+    first_move_winingstat = np.zeros((board_size, board_size))
+
     for each_game in games:
         if each_game.get("winner") == focused_result:  # and c_ % skip_by == 0 :
             games_win_by_O.append(each_game)
+            if c_ == 0:
+                board_size = each_game.get("board_size", 5)
+            
+            r, c = each_game.get("sequence")[0].get("xy")
+            first_move_winingstat[r][c]  += 1
+            
             c_ += 1
 
+    #print(np.array(first_move_winingstat)/c_)
     T = len(games_win_by_O)
+    a = np.zeros((board_size, board_size))
 
+
+    index_to_keep_processed ={}
     def animate(i):
         global C
-        each_game = games_win_by_O[i]  # games[i]
+        each_game_local = games_win_by_O[i]  # games[i]
+        
+        # somehow this callback function cals the first element (e.g. at index 0) twice;
+        if i in index_to_keep_processed:
+            return
+        else:
+            index_to_keep_processed[i] = 1
+
         #print("focused player: %s, this_game_player: %s" % (focused_result, each_game.get("winner")))
 
         plt.clf()
+        #print("HHH")
 
-        if each_game.get("winner") == focused_result:
-            r, c = each_game.get("sequence")[0].get("xy")
+        if each_game_local.get("winner") == focused_result:
+            r, c = each_game_local.get("sequence")[0].get("xy")
             a[r][c] += 1
             C += 1
             draw_heat_map(a, C)
 
-
     anim = animation.FuncAnimation(fig, animate, frames=T, interval=10)
     anim.save('first_move_winningRate_animation.mp4', writer=writer)
-    print("Total Win: %d" % C)
-    # plt.show()
+    print("Total Win: %d" % len(games_win_by_O))
+    print(np.divide(a, len(games_win_by_O)))
 
 
 def visualize_historical_games(filename):

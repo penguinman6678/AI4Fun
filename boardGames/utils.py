@@ -46,14 +46,14 @@ def print_three_arrays_helper(an_arry, d, flag_for_x=False):
         output_str = output_str.replace("2.00", "O").replace("0.00", "-").replace("1.00", "X")
     return output_str
 
-def print_three_arrays(arr1, arr2, arr3):
+def print_three_arrays(arr1, arr2, arr3, upto_p):
     fmt = "{a1:s}\t{a2:s}\t{a3:s}"
     fromhere = 0
-    upto = 3
+    upto = upto_p
     d = 2
     s1 = print_three_arrays_helper(arr1[fromhere:upto], d)
-    for i in range(1, 4):
-        upto = i * 3
+    for i in range(1, upto_p+1):
+        upto = i * upto_p
 
         print(fmt.format(a1=print_three_arrays_helper(arr1[fromhere:upto], d, True),
                          a2=print_three_arrays_helper(arr2[fromhere:upto], d),
